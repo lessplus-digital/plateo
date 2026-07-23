@@ -1,0 +1,85 @@
+---
+/**
+ * Carrusel sin dependencias: CSS scroll-snap + un script mínimo para las flechas.
+ *
+ * Por qué no una librería: scroll-snap ya da arrastre nativo, inercia, teclado
+ * y touch gratis. Embla (~6 KB) solo hace falta si se necesita loop infinito
+ * o autoplay real.
+ *
+ * Cada hijo del slot debe llevar `class="snap-start shrink-0"` y su propio ancho.
+ */
+interface Props {
+  /** Texto para lectores de pantalla que describe el conjunto. */
+  label: string;
+  class?: string;
+}
+
+const { label, class: className } = Astro.props;
+---
+
+<div class:list={['group/carousel relative', className]} data-carousel>
+  <div
+    class="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    role="region"
+    aria-label={label}
+    tabindex="0"
+    data-carousel-track
+  >
+    <slot />
+  </div>
+
+  <div class="mt-2 flex justify-end gap-2">
+    <button
+      type="button"
+      class="grid size-10 place-items-center rounded-full border border-ink-800 bg-ink-900/70 text-ink-300 transition hover:border-ink-700 hover:text-ink-100 disabled:pointer-events-none disabled:opacity-30"
+      aria-label="Anterior"
+      data-carousel-prev
+    >
+      <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="grid size-10 place-items-center rounded-full border border-ink-800 bg-ink-900/70 text-ink-300 transition hover:border-ink-700 hover:text-ink-100 disabled:pointer-events-none disabled:opacity-30"
+      aria-label="Siguiente"
+      data-carousel-next
+    >
+      <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
+    const track = root.querySelector<HTMLElement>('[data-carousel-track]');
+    const prev = root.querySelector<HTMLButtonElement>('[data-carousel-prev]');
+    const next = root.querySelector<HTMLButtonElement>('[data-carousel-next]');
+    if (!track || !prev || !next) return;
+
+    /** Avanza el ancho de un slide (o el del viewport si no hay slides). */
+    const step = () => {
+      const slide = track.firstElementChild as HTMLElement | null;
+      if (!slide) return track.clientWidth;
+      const gap = parseFloat(getComputedStyle(track).columnGap || '0');
+      return slide.offsetWidth + gap;
+    };
+
+    const syncButtons = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      // Margen de 1px: los navegadores redondean scrollLeft y el botón
+      // se quedaría habilitado para siempre al final del track.
+      prev.disabled = track.scrollLeft <= 1;
+      next.disabled = track.scrollLeft >= max - 1;
+    };
+
+    prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+    next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+    track.addEventListener('scroll', syncButtons, { passive: true });
+    window.addEventListener('resize', syncButtons, { passive: true });
+
+    syncButtons();
+  });
+</script>

@@ -1,0 +1,51 @@
+---
+import Reveal from '../ui/Reveal.astro';
+
+// Copy provisional: ajustar con el mensaje comercial definitivo.
+const FEATURES = [
+  {
+    title: 'El bot toma el pedido',
+    body: 'Atiende en WhatsApp a cualquier hora, consulta el menú real y nunca inventa un precio.',
+  },
+  {
+    title: 'Tablero en tiempo real',
+    body: 'Cada pedido aparece en cocina al instante, con sonido y estado: recibido, en preparación, en camino.',
+  },
+  {
+    title: 'Clientes que vuelven',
+    body: 'Historial, frecuencia y gasto de cada cliente. Sabes a quién escribirle y cuándo.',
+  },
+  {
+    title: 'Reservas sin agenda de papel',
+    body: 'Mesas confirmadas por WhatsApp y visibles para todo el equipo.',
+  },
+  {
+    title: 'Números que sirven',
+    body: 'Ventas del día, productos más pedidos y horas pico. Sin exportar nada a Excel.',
+  },
+  {
+    title: 'Tu base de datos es tuya',
+    body: 'Una instancia dedicada por restaurante. Sin marketplace de por medio y sin comisión por venta.',
+  },
+];
+---
+
+<section id="producto" class="container-page scroll-mt-24 py-24 md:py-32">
+  <Reveal>
+    <h2 class="max-w-2xl text-4xl font-semibold tracking-tight text-balance md:text-5xl">
+      Todo lo que pasa entre el "hola" y el domicilio entregado
+    </h2>
+  </Reveal>
+
+  <ul class="mt-14 grid gap-px overflow-hidden rounded-2xl border border-ink-800 bg-ink-800 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      FEATURES.map(({ title, body }, i) => (
+        // El delay escalonado hace que la grilla entre en cascada, no en bloque.
+        <Reveal as="li" delay={i * 70} class="bg-ink-950 p-7 transition-colors hover:bg-ink-900/60">
+          <h3 class="text-base font-medium">{title}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-ink-300">{body}</p>
+        </Reveal>
+      ))
+    }
+  </ul>
+</section>

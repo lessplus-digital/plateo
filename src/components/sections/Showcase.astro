@@ -1,0 +1,63 @@
+---
+import Carousel from '../ui/Carousel.astro';
+import Reveal from '../ui/Reveal.astro';
+
+/**
+ * Vitrina del producto. Cada slide debería llevar un <VideoLoop /> con la
+ * grabación real de esa pantalla; por ahora son marcadores de posición.
+ */
+const SLIDES = [
+  {
+    title: 'Conversación en WhatsApp',
+    body: 'El cliente escribe, el asistente responde con el menú real y confirma el pedido.',
+  },
+  {
+    title: 'Tablero de pedidos',
+    body: 'El pedido entra a cocina en segundos y avanza por columnas hasta la entrega.',
+  },
+  {
+    title: 'Ficha de cliente',
+    body: 'Historial completo, dirección guardada y cuánto ha gastado.',
+  },
+  {
+    title: 'Estadísticas del día',
+    body: 'Ventas, ticket promedio y qué se está vendiendo ahora mismo.',
+  },
+];
+---
+
+<section id="como-funciona" class="scroll-mt-24 py-24 md:py-32">
+  <div class="container-page">
+    <Reveal>
+      <h2 class="max-w-2xl text-4xl font-semibold tracking-tight text-balance md:text-5xl">
+        Así se ve por dentro
+      </h2>
+      <p class="mt-4 max-w-xl text-lg text-ink-300 text-pretty">
+        Nada de capturas retocadas: estas son las pantallas que usa el equipo todos los días.
+      </p>
+    </Reveal>
+  </div>
+
+  <!-- El carrusel se sale del contenedor a propósito: sugiere que hay más. -->
+  <Reveal variant="fade" delay={120} class="container-page mt-12">
+    <Carousel label="Pantallas del producto" class="mask-edges">
+      {
+        SLIDES.map(({ title, body }) => (
+          <article class="w-[85vw] shrink-0 snap-start sm:w-[28rem]">
+            <div class="aspect-[4/3] overflow-hidden rounded-xl border border-ink-800 bg-gradient-to-b from-ink-900 to-ink-950">
+              {/*
+                TODO: sustituir por
+                <VideoLoop src="/videos/x.mp4" webm="/videos/x.webm"
+                           poster="/videos/x.jpg" width={1280} height={960}
+                           label={title} class="size-full object-cover" />
+              */}
+              <div class="grid h-full place-items-center text-xs text-ink-500">{title}</div>
+            </div>
+            <h3 class="mt-4 text-base font-medium">{title}</h3>
+            <p class="mt-1 text-sm text-ink-300">{body}</p>
+          </article>
+        ))
+      }
+    </Carousel>
+  </Reveal>
+</section>

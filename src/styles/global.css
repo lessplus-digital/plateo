@@ -1,0 +1,180 @@
+@import 'tailwindcss';
+
+/*
+  Fuente self-hosted (no Google Fonts CDN: bloquea el render y es un hit de
+  privacidad/RGPD). `wght.css` trae solo el eje de peso, y el unicode-range
+  hace que el navegador descargue únicamente el subset latino.
+*/
+@import '@fontsource-variable/inter/wght.css';
+
+/* ==========================================================================
+   Design tokens — Plateo
+   Todo lo de aquí queda disponible como utilidad de Tailwind:
+   --color-brand-500  ->  bg-brand-500 / text-brand-500 / border-brand-500
+   --font-sans        ->  font-sans
+   --animate-marquee  ->  animate-marquee
+   ========================================================================== */
+@theme {
+  /* --- Superficies (diseño dark-first) --- */
+  --color-ink-950: oklch(0.16 0.012 264);
+  --color-ink-900: oklch(0.21 0.014 264);
+  --color-ink-800: oklch(0.27 0.016 264);
+  --color-ink-700: oklch(0.37 0.016 264);
+  --color-ink-500: oklch(0.58 0.014 264);
+  --color-ink-300: oklch(0.78 0.01 264);
+  --color-ink-100: oklch(0.94 0.005 264);
+
+  /* --- Marca. PLACEHOLDER: sustituir cuando exista la identidad oficial. --- */
+  --color-brand-50: oklch(0.97 0.02 65);
+  --color-brand-200: oklch(0.89 0.07 65);
+  --color-brand-400: oklch(0.78 0.15 55);
+  --color-brand-500: oklch(0.71 0.18 48);
+  --color-brand-600: oklch(0.63 0.18 44);
+  --color-brand-700: oklch(0.53 0.15 42);
+
+  /* --- Tipografía: una sola familia variable, self-hosted --- */
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* --- Curvas de animación --- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* --- Animaciones reutilizables --- */
+  --animate-marquee: marquee 45s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-0.75rem);
+    }
+  }
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Compensa el header sticky al saltar a un #ancla */
+    scroll-padding-top: 6rem;
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--color-ink-950);
+    color: var(--color-ink-100);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Los números tabulares no bailan al animarse (precios, contadores) */
+  :where(.tnum) {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :where(:focus-visible) {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--color-brand-500);
+    color: var(--color-ink-950);
+  }
+}
+
+/* ==========================================================================
+   Scroll reveal
+   El JS solo añade `.is-revealed`; toda la animación vive en CSS.
+   Si el usuario pide menos movimiento, el contenido se muestra sin animar.
+   ========================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translate3d(var(--reveal-x, 0), var(--reveal-y, 1.75rem), 0)
+      scale(var(--reveal-scale, 1));
+    transition:
+      opacity 0.8s var(--ease-out-expo),
+      transform 0.8s var(--ease-out-expo);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  [data-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+  }
+}
+
+/* Sin JS (o si falla), nada queda invisible. */
+html.no-js [data-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================================================
+   Utilidades propias
+   ========================================================================== */
+@utility container-page {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 80rem;
+  padding-inline: 1.25rem;
+
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+  }
+}
+
+/* Degradado de texto para titulares */
+@utility text-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-ink-100) 25%,
+    var(--color-brand-400) 75%
+  );
+  background-clip: text;
+  color: transparent;
+}
+
+/* Difumina los bordes de un carrusel para insinuar que hay más contenido */
+@utility mask-edges {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 4rem,
+    black calc(100% - 4rem),
+    transparent
+  );
+}

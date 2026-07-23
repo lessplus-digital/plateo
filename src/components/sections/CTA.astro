@@ -1,0 +1,36 @@
+---
+import Button from '../ui/Button.astro';
+import Reveal from '../ui/Reveal.astro';
+import { LINKS } from '../../consts';
+---
+
+<section id="precios" class="container-page scroll-mt-24 py-24 md:py-32">
+  <Reveal variant="scale">
+    <div
+      class="relative overflow-hidden rounded-3xl border border-ink-800 bg-ink-900/50 px-8 py-16 text-center md:px-16 md:py-24"
+    >
+      <div
+        class="pointer-events-none absolute inset-x-0 -top-40 h-80 bg-[radial-gradient(circle,var(--color-brand-600)_0%,transparent_65%)] opacity-20 blur-3xl"
+        aria-hidden="true"
+      >
+      </div>
+
+      <h2 class="mx-auto max-w-2xl text-4xl font-semibold tracking-tight text-balance md:text-5xl">
+        Te mostramos Plateo con el menú de tu restaurante
+      </h2>
+      <p class="mx-auto mt-5 max-w-xl text-lg text-ink-300 text-pretty">
+        Cargamos tus productos reales y te dejamos probar el bot desde tu propio WhatsApp.
+        Sin instalar nada.
+      </p>
+
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        <Button href={LINKS.whatsapp} variant="primary" size="lg" external>
+          Escribir por WhatsApp
+        </Button>
+        <Button href={`mailto:${LINKS.email}`} variant="secondary" size="lg">
+          Escribir un correo
+        </Button>
+      </div>
+    </div>
+  </Reveal>
+</section>

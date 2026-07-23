@@ -1,0 +1,47 @@
+---
+import { NAV, SITE, LINKS } from '../../consts';
+import Button from '../ui/Button.astro';
+---
+
+<header
+  class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition-colors duration-300 data-[scrolled]:border-ink-800 data-[scrolled]:bg-ink-950/80 data-[scrolled]:backdrop-blur-xl"
+  data-header
+>
+  <div class="container-page flex h-18 items-center justify-between gap-6">
+    <a href="/" class="text-lg font-semibold tracking-tight" aria-label={`${SITE.name} — inicio`}>
+      {SITE.name}
+    </a>
+
+    <nav class="hidden items-center gap-8 md:flex" aria-label="Principal">
+      {
+        NAV.map(({ label, href }) => (
+          <a href={href} class="text-sm text-ink-300 transition-colors hover:text-ink-100">
+            {label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <Button href={LINKS.login} variant="ghost" external class="hidden sm:inline-flex">
+        Iniciar sesión
+      </Button>
+      <Button href={LINKS.whatsapp} variant="primary" external>Pedir demo</Button>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Fondo translúcido solo tras hacer scroll: el hero se ve limpio al cargar.
+  const header = document.querySelector<HTMLElement>('[data-header]');
+
+  if (header) {
+    const sync = () => {
+      if (window.scrollY > 24) header.setAttribute('data-scrolled', '');
+      else header.removeAttribute('data-scrolled');
+    };
+
+    sync();
+    window.addEventListener('scroll', sync, { passive: true });
+  }
+</script>

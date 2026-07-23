@@ -1,0 +1,34 @@
+---
+/**
+ * Envuelve cualquier contenido para que aparezca al entrar en pantalla.
+ * Coste: 0 KB extra — reutiliza el observer global de scripts/reveal.ts.
+ *
+ * <Reveal delay={120} variant="left">…</Reveal>
+ */
+interface Props {
+  /** Etiqueta a renderizar. Útil para no romper la semántica (li, section…). */
+  as?: keyof HTMLElementTagNameMap;
+  /** Retardo en ms. Escalona items de una grilla: delay={i * 80}. */
+  delay?: number;
+  variant?: 'up' | 'down' | 'left' | 'right' | 'fade' | 'scale';
+  class?: string;
+}
+
+const { as: Tag = 'div', delay = 0, variant = 'up', class: className } = Astro.props;
+
+// Cada variante solo cambia las custom properties que lee el CSS.
+const VARIANTS: Record<NonNullable<Props['variant']>, Record<string, string>> = {
+  up: { '--reveal-y': '1.75rem' },
+  down: { '--reveal-y': '-1.75rem' },
+  left: { '--reveal-x': '-1.75rem', '--reveal-y': '0' },
+  right: { '--reveal-x': '1.75rem', '--reveal-y': '0' },
+  fade: { '--reveal-y': '0' },
+  scale: { '--reveal-y': '0', '--reveal-scale': '0.96' },
+};
+
+const style = { ...VARIANTS[variant], '--reveal-delay': `${delay}ms` };
+---
+
+<Tag data-reveal class={className} style={style}>
+  <slot />
+</Tag>
