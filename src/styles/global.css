@@ -58,6 +58,11 @@
   --color-navy-800: oklch(0.32 0.093 283.8);
   --color-navy-900: oklch(0.262 0.098 283.8); /* ← navy oficial #211951 */
   --color-navy-950: oklch(0.205 0.082 283.8);
+  /* El escalón más oscuro baja el croma casi a la mitad. El navy de marca es
+     muy violeta, y en superficies grandes y oscuras —la carcasa de un móvil,
+     un marco— se lee como morado saturado en vez de como negro. Igual que el
+     extremo claro de la rampa, que también pierde croma. */
+  --color-navy-975: oklch(0.155 0.045 283.8);
 
   /* --- Violeta. Acento secundario y color de enlace. --- */
   --color-violet-50: oklch(0.965 0.022 285.3);
@@ -348,13 +353,27 @@ html.no-js [data-draw] .draw-path {
   transform-origin: left center;
 }
 
-/* Difumina los bordes de un carrusel para insinuar que hay más contenido */
+/*
+  Difumina los bordes de un carrusel para insinuar que hay más contenido.
+
+  Los dos lados se controlan por separado con `--mask-start` y `--mask-end`,
+  porque el fundido solo tiene sentido en el lado por el que queda contenido:
+  al principio del recorrido no hay nada que insinuar a la izquierda, y
+  desvanecer la primera tarjeta solo estorba para leerla. El carrusel pone esas
+  variables a cero según dónde esté el scroll.
+
+  Aplícala a la PISTA que hace scroll, nunca al contenedor entero: si envuelve
+  también los controles, el fundido se come los botones.
+*/
 @utility mask-edges {
+  --mask-start: 3rem;
+  --mask-end: 3rem;
+
   mask-image: linear-gradient(
     to right,
     transparent,
-    black 3rem,
-    black calc(100% - 3rem),
+    black var(--mask-start),
+    black calc(100% - var(--mask-end)),
     transparent
   );
 }

@@ -4,29 +4,55 @@ import Reveal from '../ui/Reveal.astro';
 import Mark from '../ui/Mark.astro';
 import Doodle from '../ui/Doodle.astro';
 import Sticker from '../ui/Sticker.astro';
-import Ticket from '../ui/Ticket.astro';
 import { LINKS } from '../../consts';
 
 /**
- * Hero asimétrico: el argumento a la izquierda y, a la derecha, el objeto que
- * Plateo reemplaza — la comanda de papel.
+ * Hero asimétrico: el argumento a la izquierda y, a la derecha, el agente
+ * trabajando.
  *
- * A propósito NO hay captura del panel aquí. Esa aparece más abajo, en la demo
- * en vivo, y verla dos veces la desactiva. Lo que tiene que quedar de esta
- * pantalla es el problema, no el software.
+ * La conversación del teléfono está elegida para que en un solo hilo se vean
+ * TRES capacidades distintas —reserva, pedido y cobro—, no un pedido de pizza
+ * más. Es lo que hace que el visual diga algo en vez de solo decorar.
+ *
+ * No se repite con <LiveDemo />: allí la conversación se reproduce en el
+ * tiempo y lo que importa es el tablero reaccionando; aquí es un objeto fijo y
+ * anotado a mano, y lo que importa es la amplitud de lo que el agente resuelve.
  */
 
 /** Lo que hoy hace el mismo trabajo que Plateo, y por qué se cae. */
 const REEMPLAZA = ['la libreta de la caja', 'el grito a la cocina', 'el Excel de los domingos'];
+
+/** Hilo del teléfono. `tipo` cambia cómo se pinta la burbuja. */
+interface Mensaje {
+  de: 'cliente' | 'plateo';
+  texto: string;
+  /** Adjunto que se dibuja encima del texto. */
+  tipo?: 'comprobante';
+}
+
+const CHAT: Mensaje[] = [
+  { de: 'cliente', texto: '¡Buenas! Una napolitana grande y dos gaseosas 🍕' },
+  {
+    de: 'plateo',
+    texto: '¡Claro! Van $58.000. ¿Le agrego borde de queso por $6.000?',
+  },
+  { de: 'cliente', texto: 'Sí porfa, y sin cebolla' },
+  {
+    de: 'plateo',
+    texto: 'Anotado: sin cebolla 📝 Total $64.000. ¿Te lo llevo a la Calle 93 #12-40?',
+  },
+  { de: 'cliente', tipo: 'comprobante', texto: 'Esa misma. Ahí te transferí' },
+  { de: 'plateo', texto: 'Pago confirmado ✅ Sale del horno en 25 min.' },
+];
 ---
 
 <section class="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-28">
-  <!--
+  {/*
     Fondo: retícula tenue que se desvanece. Sustituye al degradado radial
     difuminado de rigor, que a estas alturas es el sello de cualquier plantilla.
-  -->
+  */}
   <div
-    class="pointer-events-none absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_50%_0%,black,transparent_72%)] opacity-[0.5]"
+    class="pointer-events-none absolute inset-0 -z-10 opacity-50 [mask-image:radial-gradient(ellipse_at_50%_0%,black,transparent_72%)]"
     aria-hidden="true"
   >
     <div
@@ -37,8 +63,8 @@ const REEMPLAZA = ['la libreta de la caja', 'el grito a la cocina', 'el Excel de
   </div>
 
   <div class="container-page">
-    <div class="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
-      <!-- ================= Argumento ================= -->
+    <div class="grid items-center gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
+      {/* ================= Argumento ================= */}
       <div>
         <Reveal variant="fade">
           <p
@@ -53,16 +79,16 @@ const REEMPLAZA = ['la libreta de la caja', 'el grito a la cocina', 'el Excel de
           as="h1"
           delay={70}
           blur={14}
-          class="mt-6 text-[2.6rem] leading-[1.04] font-semibold tracking-tight text-balance md:text-6xl"
+          class="mt-6 text-[2.6rem] leading-[1.06] font-semibold tracking-tight text-balance md:text-6xl"
         >
-          Tus pedidos de WhatsApp dejan de vivir en
-          <Mark variant="underline" tone="mint" delay={620}>el celular</Mark> del mesero.
+          Un agente IA atiende WhatsApp. Tu equipo atiende{' '}
+          <Mark variant="underline" tone="mint" delay={620}>el local</Mark>.
         </Reveal>
 
         <Reveal delay={150} class="mt-6 max-w-xl text-lg text-text-muted text-pretty">
           <p>
-            Un asistente atiende el chat a toda hora, arma el pedido con tu menú real y lo
-            manda al tablero de cocina. Tú ves todo desde una sola pantalla.
+            Toma pedidos, aparta mesas y responde dudas a cualquier hora, con tu menú y tus
+            precios. Todo entra ordenado a un solo tablero, sin comisión por venta.
           </p>
         </Reveal>
 
@@ -73,11 +99,15 @@ const REEMPLAZA = ['la libreta de la caja', 'el grito a la cocina', 'el Excel de
           <Button href="#en-vivo" variant="secondary" size="lg">Ver cómo funciona</Button>
         </Reveal>
 
-        <!-- Nota manuscrita colgando del CTA, con su flecha -->
-        <Reveal delay={300} class="mt-5 flex items-start gap-2 pl-2">
-          <Doodle shape="arrow-short" tone="violet" width={44} rotate={-8} delay={520} />
-          <p class="handwritten mt-1 text-text-muted">
-            te respondemos con el menú de tu propio local
+        {/*
+          Nota al margen con su flecha. `items-end` es lo que las alinea: la
+          punta de la flecha cae abajo a la derecha del dibujo, así que con
+          `items-start` quedaba muy por debajo del texto al que señala.
+        */}
+        <Reveal delay={300} class="mt-5 flex items-end gap-2 pl-1">
+          <Doodle shape="arrow-short" tone="violet" width={42} rotate={-6} delay={520} />
+          <p class="handwritten pb-0.5 text-text-muted">
+            te contestamos con el menú de tu propio local
           </p>
         </Reveal>
 
@@ -104,63 +134,121 @@ const REEMPLAZA = ['la libreta de la caja', 'el grito a la cocina', 'el Excel de
         </Reveal>
       </div>
 
-      <!-- ================= La comanda ================= -->
-      <div class="relative mx-auto w-full max-w-sm lg:mx-0 lg:justify-self-end">
-        <!-- Dos tiquetes asomando por detrás: la pila de comandas de una noche -->
-        <div
-          class="ticket-edge absolute -top-5 right-4 h-40 w-[85%] rounded-sm bg-navy-100"
-          style="transform: rotate(4.5deg)"
-          aria-hidden="true"
+      {/* ================= El agente trabajando ================= */}
+      <div class="relative flex justify-center lg:justify-end">
+        {/*
+          Anotaciones a mano señalando dos momentos del hilo. Solo en pantallas
+          anchas: por debajo de lg no hay hueco a la izquierda del teléfono y
+          acabarían encima de la conversación.
+
+          Se anclan por la DERECHA, no por la izquierda. La columna es bastante
+          más ancha que el teléfono, así que `left-0` las mandaba al borde de
+          la columna y la flecha quedaba señalando al vacío. Con `right-[17rem]`
+          —el teléfono mide 18rem— el borde derecho de la anotación cae justo
+          dentro de la carcasa, y la punta toca lo que señala.
+        */}
+        <Reveal
+          variant="left"
+          delay={820}
+          blur={0}
+          class="absolute top-[27%] right-[17rem] z-20 hidden items-center gap-1.5 lg:flex"
         >
-        </div>
-        <div
-          class="ticket-edge absolute -top-2.5 left-3 h-44 w-[88%] rounded-sm bg-navy-50"
-          style="transform: rotate(-2.5deg)"
-          aria-hidden="true"
-        >
-        </div>
-
-        <Reveal variant="tilt" delay={260} blur={16} class="relative">
-          <Ticket label="Pizzería Vera · Domicilio" code="#1042" rotate={-1.5}>
-            <ul class="space-y-1.5 text-sm">
-              <li class="flex justify-between gap-4">
-                <span>1 Napolitana grande</span>
-                <span class="tnum">48.000</span>
-              </li>
-              <li class="flex justify-between gap-4">
-                <span>2 Gaseosa 400 ml</span>
-                <span class="tnum">10.000</span>
-              </li>
-            </ul>
-
-            <div class="mt-3 flex justify-between gap-4 border-t border-dashed border-line-strong pt-3 text-sm font-bold">
-              <span>TOTAL</span>
-              <span class="tnum">$58.000</span>
-            </div>
-
-            <dl class="mt-4 space-y-1 text-[0.7rem] text-text-muted">
-              <div class="flex justify-between gap-4">
-                <dt>Cliente</dt>
-                <dd class="text-text">Camila M.</dd>
-              </div>
-              <div class="flex justify-between gap-4">
-                <dt>Entrega</dt>
-                <dd class="text-text">Calle 93 #12-40</dd>
-              </div>
-              <div class="flex justify-between gap-4">
-                <dt>Tomado por</dt>
-                <dd class="text-text">Plateo · 8:14 p. m.</dd>
-              </div>
-            </dl>
-          </Ticket>
+          <p class="handwritten max-w-24 text-right text-text-muted">sugiere adiciones</p>
+          <Doodle shape="arrow-short" tone="violet" width={38} rotate={-45} delay={980} />
         </Reveal>
 
-        <!-- Sello de confirmado, encima del papel -->
+        <Reveal
+          variant="left"
+          delay={940}
+          blur={0}
+          class="absolute right-[17rem] bottom-[14%] z-20 hidden items-center gap-1.5 lg:flex"
+        >
+          <p class="handwritten max-w-24 text-right text-text-muted">y confirma el pago</p>
+          <Doodle shape="arrow-short" tone="violet" width={34} rotate={-38} delay={1100} />
+        </Reveal>
+
+        <Reveal variant="tilt" delay={260} blur={16} class="relative z-10">
+          {/*
+            Carcasa y pantalla en dos tonos, del más oscuro al más claro:
+            navy-975 (marco) -> navy-950 (pantalla) -> navy-800 (burbujas del
+            agente). Antes la pantalla era el navy de marca y las burbujas
+            navy-800: apenas 0.06 de diferencia en luminosidad, así que el
+            móvil se leía como una mancha morada plana. Ahora hay 0.05 y 0.115
+            entre escalones, y el escalón más oscuro va desaturado.
+          */}
+          <div
+            class="w-[17.5rem] rounded-[2.25rem] bg-navy-975 p-2.5 shadow-2xl shadow-navy-900/25 sm:w-[18rem]"
+          >
+            <div class="overflow-hidden rounded-[1.75rem] bg-navy-950">
+              {/* Cabecera del chat */}
+              <div class="flex items-center gap-2.5 border-b border-line-inverse px-4 py-3">
+                <div
+                  class="grid size-8 shrink-0 place-items-center rounded-full bg-accent text-xs font-semibold text-navy-900"
+                  aria-hidden="true"
+                >
+                  PV
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-[0.8rem] font-medium text-text-inverse">Pizzería Vera</p>
+                  <p class="text-[0.65rem] text-accent">en línea · responde al instante</p>
+                </div>
+              </div>
+
+              {/* Hilo */}
+              <div class="flex flex-col gap-2 px-3.5 py-4">
+                {
+                  CHAT.map((msg) => (
+                    <div
+                      class:list={[
+                        'max-w-[86%] rounded-2xl px-3 py-2 text-[0.78rem] leading-snug',
+                        msg.de === 'cliente'
+                          ? 'self-end rounded-br-sm bg-accent text-navy-900'
+                          : 'self-start rounded-bl-sm bg-navy-800 text-text-inverse',
+                      ]}
+                    >
+                      {msg.tipo === 'comprobante' && (
+                        <div
+                          class="mb-1.5 flex items-center gap-2 rounded-lg bg-navy-900/15 px-2 py-1.5"
+                          aria-hidden="true"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 5.5h16v13H4z" />
+                            <path d="M4 15l5-4 4 3 3-2.5 4 3.5" />
+                            <path d="M9 9.5v.1" />
+                          </svg>
+                          <span class="text-[0.68rem] font-medium">comprobante.jpg</span>
+                        </div>
+                      )}
+                      <p>{msg.texto}</p>
+                    </div>
+                  ))
+                }
+              </div>
+
+              {/* Barra de escritura */}
+              <div class="flex items-center gap-2 border-t border-line-inverse px-4 py-3">
+                <span class="flex-1 text-[0.7rem] text-navy-400">Escribe un mensaje…</span>
+                <span class="text-sm font-bold text-accent" aria-hidden="true">➤</span>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+
+        {/*
+          Sello colgando de la esquina inferior derecha. Estaba en `bottom-6`,
+          es decir tumbado sobre la barra de escritura, y se leía como parte de
+          la interfaz en vez de como algo pegado encima. Descolgado en diagonal
+          solo pisa la esquina redondeada, que es como se pega una pegatina.
+
+          El desplazamiento se queda dentro del padding de `container-page`
+          (2rem en md+), así que no lo recorta el `overflow-hidden` de la
+          sección.
+        */}
         <Reveal
           variant="scale"
-          delay={620}
+          delay={700}
           blur={0}
-          class="absolute -right-1 -bottom-3 z-10 sm:-right-4"
+          class="absolute -right-3 -bottom-4 z-30 sm:-right-5"
         >
           <Sticker tone="mint" rotate={-7}>
             <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -171,16 +259,16 @@ const REEMPLAZA = ['la libreta de la caja', 'el grito a la cocina', 'el Excel de
                 stroke-linecap="round"
                 stroke-linejoin="round"></path>
             </svg>
-            Confirmado en 40 segundos
+            Sin apps ni comisiones
           </Sticker>
         </Reveal>
 
         <Doodle
           shape="sparkle"
           tone="violet"
-          width={34}
-          delay={760}
-          class="absolute -top-8 -left-2 hidden sm:block"
+          width={30}
+          delay={860}
+          class="absolute -top-4 right-2 z-30 hidden sm:block"
         />
       </div>
     </div>

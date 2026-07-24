@@ -18,10 +18,10 @@ const props = Astro.props;
 <html lang={SITE.lang} class="no-js">
   <head>
     <BaseHead {...props} />
-    <!--
+    {/*
       Quita `no-js` antes del primer paint. Si el JS está bloqueado la clase
       se queda y el CSS muestra todo el contenido sin animación.
-    -->
+    */}
     <script is:inline>
       document.documentElement.classList.remove('no-js');
     </script>

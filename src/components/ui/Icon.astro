@@ -1,0 +1,82 @@
+---
+/**
+ * Iconografía propia. Seis glifos, uno por capacidad del producto.
+ *
+ * Están dibujados a mano sobre una retícula de 24x24 y a propósito NO son
+ * geométricamente perfectos: los trazos cierran un pelo desalineados y las
+ * curvas no son simétricas, igual que los garabatos de <Doodle />. Un set de
+ * iconos perfecto (Lucide, Heroicons) delataría la plantilla al instante —
+ * son los mismos en media web.
+ *
+ * Todo es `stroke` con `currentColor`, así que el color lo pone el contenedor.
+ */
+interface Props {
+  name: 'agente' | 'pedido' | 'reservas' | 'atencion' | 'estadisticas' | 'resenas' | 'soporte';
+  /** Lado en px. Se dibujan pensados para 24-32. */
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 26, class: className } = Astro.props;
+
+/** Cada icono es una lista de paths; el último valor indica si va relleno. */
+const ICONS: Record<Props['name'], string[]> = {
+  // Burbuja de chat con un destello dentro: el agente que entiende.
+  agente: [
+    'M3.4 11.3c0-4 3.7-7.2 8.3-7.2s8.3 3.2 8.3 7.2-3.7 7.2-8.3 7.2c-1 0-2-.1-2.9-.4l-4.5 2 1.2-3.6c-1.3-1.4-2.1-3.2-2.1-5.2Z',
+    'M11.6 7.9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1 1-2.4Z',
+  ],
+  // Comanda con el borde dentado, como el <Ticket />.
+  pedido: [
+    'M6.1 3.6h11.8v16l-2-1.4-1.9 1.4-2-1.4-1.9 1.4-2-1.4-2 1.4v-16Z',
+    'M9 8.2h6.1',
+    'M9 11.6h4.2',
+  ],
+  // Agenda con la marca de confirmado.
+  reservas: [
+    'M4.2 6.3h15.6v13.4H4.2V6.3Z',
+    'M4.2 10.2h15.6',
+    'M8.4 3.8v3.1',
+    'M15.7 3.8v3.1',
+    'M9.1 14.9l2.1 2.1 3.7-4.1',
+  ],
+  // Burbuja con interrogación: las preguntas de siempre.
+  atencion: [
+    'M4 5.4h16v10.9h-7.2l-4.2 3.9v-3.9H4V5.4Z',
+    'M10 8.9a2 2 0 0 1 3.9.7c0 1.4-1.9 1.6-1.9 2.8',
+    'M12 14.3v.1',
+  ],
+  // Barras más línea de tendencia.
+  estadisticas: [
+    'M4.1 19.8h15.8',
+    'M7.4 19.8v-4.6',
+    'M11.9 19.8v-8.1',
+    'M16.4 19.8v-6.3',
+    'M5.6 9.4l4.1-3.4 3.9 2.4 4.6-4.6',
+  ],
+  // Estrella dibujada de un trazo.
+  resenas: ['M12 3.7l2.6 5.2 5.7.8-4.1 4 1 5.7-5.2-2.7-5.1 2.7 1-5.7-4.1-4 5.7-.8L12 3.7Z'],
+  // Una persona junto a un chat: la parte en la que alguien de carne y hueso
+  // entra a la conversación.
+  soporte: [
+    'M8.9 10.4a3 3 0 1 0 0-6.1 3 3 0 0 0 0 6.1Z',
+    'M3.6 19.9c0-3 2.4-5 5.3-5s5.3 2 5.3 5',
+    'M14.6 3.9h5.8v4.6h-2.1l-1.7 1.8V8.5h-2V3.9Z',
+  ],
+};
+---
+
+<svg
+  viewBox="0 0 24 24"
+  width={size}
+  height={size}
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  class={className}
+>
+  {ICONS[name].map((d) => <path d={d} />)}
+</svg>

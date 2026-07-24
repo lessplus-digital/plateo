@@ -12,9 +12,20 @@ import CTA from '../components/sections/CTA.astro';
 {/* Sin `title`: la home usa SITE.defaultTitle completo. */}
 <Layout>
   {/*
-    El orden dibuja un arco de color — claro, menta, oscuro, claro, oscuro —
-    para que el scroll tenga ritmo y ningún bloque se parezca al anterior.
-    Si añades una sección, mira dónde cae dentro de ese arco.
+    Cada sección responde una pregunta distinta, y ese es el orden:
+      Hero        por qué te importa
+      Features    qué hace          -> iconografía, sin capturas
+      LiveDemo    míralo funcionando -> el momento fuerte de la página
+      Steps       cómo se pone en marcha
+      Showcase    cómo se ve por dentro -> aquí van las capturas reales
+      Testimonial a quién le funcionó
+      CTA         qué hago ahora
+
+    Features no lleva pantallazos a propósito: le robarían el golpe a LiveDemo
+    y al Showcase, que es donde de verdad se ven las pantallas.
+
+    El color alterna claro / oscuro para que el scroll tenga ritmo. Si añades
+    una sección, mira que no queden dos oscuras seguidas.
   */}
   <Hero />
   <Features />

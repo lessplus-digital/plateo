@@ -12,6 +12,21 @@
  * Se dibuja solo al entrar en pantalla: reutiliza el observer global de
  * scripts/reveal.ts (0 KB extra) mediante el atributo `data-reveal`.
  *
+ * ⚠️ El espacio de antes hay que escribirlo como `{' '}`:
+ *
+ *     Tu equipo atiende{' '}
+ *     <Mark>el local</Mark>.
+ *
+ * Si se deja el espacio suelto al final de la línea anterior, el compilador de
+ * Astro lo recorta al saltar de línea y sale «atiendeel local». Poner el texto
+ * y la etiqueta en la misma línea también funciona, pero es frágil: en cuanto
+ * el formateador parta la línea por longitud, el fallo vuelve sin que nadie
+ * toque el contenido. `{' '}` es una expresión y nunca se recorta.
+ *
+ * Y no lo arregles metiendo el espacio DENTRO del slot (`<Mark> el local`): el
+ * envoltorio es `inline-block` y el CSS descarta el blanco al principio de la
+ * caja, así que ahí tampoco se ve.
+ *
  * Dos reglas de uso:
  *
  * 1. Como mucho UNA marca por titular. Dos compiten entre ellas y el énfasis

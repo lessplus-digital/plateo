@@ -1,30 +1,82 @@
 ---
+import { Image } from 'astro:assets';
 import Carousel from '../ui/Carousel.astro';
 import Reveal from '../ui/Reveal.astro';
 
+/*
+  La extensión va en minúscula porque Astro declara los tipos de imagen para
+  `*.png`, y las declaraciones de módulo de TypeScript distinguen mayúsculas:
+  con `.PNG` el import no tiene tipo y `astro check` lo rechaza.
+*/
+import pedidos from '../../assets/pantallas/vista_pedidos.png';
+import soporte from '../../assets/pantallas/vista_soporte.png';
+import reservas from '../../assets/pantallas/vista_reservas.png';
+import stats from '../../assets/pantallas/vista_stats.png';
+import stats2 from '../../assets/pantallas/vista_stats2.png';
+import reviews from '../../assets/pantallas/vista_reviews.png';
+import historial from '../../assets/pantallas/vista_history.png';
+import negocio from '../../assets/pantallas/vista_infolocal.png';
+
 /**
- * Vitrina del producto. Cada slide debería llevar un <VideoLoop /> con la
- * grabación real de esa pantalla; por ahora son marcadores de posición.
+ * Galería del panel: una diapositiva por pantalla real del producto.
  *
- * TODO: grabar las cuatro pantallas y sustituir los marcadores. El comando de
- * ffmpeg está documentado dentro de VideoLoop.astro.
+ * Las capturas se importan desde `src/assets/` para que pasen por
+ * `astro:assets`: de ahí salen el AVIF/WebP, el redimensionado y los
+ * width/height que evitan el salto de layout. Si se dejaran en `public/`
+ * viajarían como PNG de 1870px y ~1,4 MB en total.
+ *
+ * Para añadir una pantalla: deja el PNG en `src/assets/pantallas/`, impórtalo
+ * arriba y añade su entrada aquí. El titular no menciona cuántas son a
+ * propósito, así que no hay que tocar nada más.
  */
 const SLIDES = [
   {
+    src: pedidos,
     title: 'Tablero de pedidos',
-    body: 'La pantalla que vive abierta en la cocina durante todo el turno.',
+    body: 'Por aprobar, en cocina y en camino. La pantalla que vive abierta todo el turno.',
+    alt: 'Tablero de pedidos con tres columnas —por aprobar, en cocina y en camino— y tarjetas con el detalle de cada pedido.',
   },
   {
-    title: 'Ficha del cliente',
-    body: 'Qué pidió, cuándo, a dónde se le llevó y cuánto lleva gastado.',
+    src: soporte,
+    title: 'Soporte en vivo',
+    body: 'Cuando el cliente necesita a una persona, tomas la conversación sin salir del panel.',
+    alt: 'Pantalla de soporte con la lista de conversaciones activas y un chat en el que el administrador responde al cliente.',
   },
   {
-    title: 'Menú y disponibilidad',
-    body: 'Se acabó la hawaiana: se apaga desde el celular y el bot deja de ofrecerla.',
+    src: reservas,
+    title: 'Reservas',
+    body: 'La semana completa, con cada mesa apartada y confirmada por chat.',
+    alt: 'Calendario semanal de reservas con las mesas apartadas por día y hora.',
   },
   {
-    title: 'Cierre del día',
-    body: 'Ventas, ticket promedio y los platos que más salieron, sin cuadrar nada a mano.',
+    src: stats,
+    title: 'Estadísticas',
+    body: 'Pedidos, ingresos, ticket promedio y cuánto te estás demorando en entregar.',
+    alt: 'Panel de estadísticas con indicadores de pedidos e ingresos, una gráfica de evolución y el tiempo de entrega.',
+  },
+  {
+    src: stats2,
+    title: 'Productos y horas pico',
+    body: 'Qué se vende, qué no se vende y a qué hora de qué día entra la plata.',
+    alt: 'Ranking de productos más y menos pedidos junto a un mapa de calor de pedidos por día y hora.',
+  },
+  {
+    src: reviews,
+    title: 'Reseñas',
+    body: 'Cada calificación con su pedido. Las buenas van camino a Google; las malas, a tu bandeja.',
+    alt: 'Pantalla de reseñas con la calificación promedio, el reparto por estrellas y las opiniones de cada cliente.',
+  },
+  {
+    src: historial,
+    title: 'Historial',
+    body: 'Todos los pedidos, con filtros por fecha y estado, y exportables a Excel o CSV.',
+    alt: 'Tabla del historial de pedidos con fecha, cliente, tipo, total y estado, y el menú de exportación abierto.',
+  },
+  {
+    src: negocio,
+    title: 'Información del negocio',
+    body: 'Horarios, cobertura, medios de pago y tiempos. De aquí saca el agente sus respuestas.',
+    alt: 'Formulario de configuración del negocio con identidad, contacto, horarios y datos de operación.',
   },
 ];
 ---
@@ -39,35 +91,38 @@ const SLIDES = [
       </Reveal>
 
       <Reveal as="h2" delay={70} class="mt-4 text-4xl font-semibold text-balance md:text-5xl">
-        Las cuatro pantallas que de verdad se usan
+        El dashboard, pantalla por pantalla
       </Reveal>
 
       <Reveal delay={140} class="mt-5 text-lg text-text-muted text-pretty">
         <p>
-          No hay veinte módulos ni un menú lateral con cosas que nadie abre. Estas son
-          todas.
+          Sin módulos de relleno ni menús laterales con cosas que nadie abre. Esto es
+          exactamente lo que ve tu equipo desde el primer día.
         </p>
       </Reveal>
     </div>
   </div>
 
-  <!-- El carrusel se sale del contenedor a propósito: sugiere que hay más. -->
+  {/* El carrusel se sale del contenedor a propósito: sugiere que hay más. */}
   <Reveal variant="fade" delay={180} class="container-page mt-12">
-    <Carousel label="Pantallas del producto" class="mask-edges">
+    <Carousel label="Pantallas del panel de Plateo">
       {
-        SLIDES.map(({ title, body }) => (
-          <article class="w-[82vw] shrink-0 snap-start sm:w-[27rem]">
-            <div class="aspect-[4/3] overflow-hidden rounded-xl border border-line bg-surface-sunken">
-              {/*
-                TODO: sustituir por
-                <VideoLoop src="/videos/x.mp4" webm="/videos/x.webm"
-                           poster="/videos/x.jpg" width={1280} height={960}
-                           label={title} class="size-full object-cover" />
-              */}
-              <div class="grid h-full place-items-center text-xs text-text-faint">{title}</div>
+        /* Las dos primeras entran casi seguro en pantalla; el resto solo si
+           el usuario arrastra el carrusel, así que van en carga diferida. */
+        SLIDES.map(({ src, title, body, alt }, i) => (
+          <article class="w-[88vw] shrink-0 snap-start sm:w-[36rem]">
+            <div class="aspect-[2/1] overflow-hidden rounded-xl border border-line bg-surface-sunken">
+              <Image
+                src={src}
+                alt={alt}
+                width={1200}
+                densities={[1, 2]}
+                loading={i < 2 ? 'eager' : 'lazy'}
+                class="size-full object-cover object-top"
+              />
             </div>
             <h3 class="mt-4 text-base font-semibold">{title}</h3>
-            <p class="mt-1 text-sm text-text-muted">{body}</p>
+            <p class="mt-1 text-sm text-text-muted text-pretty">{body}</p>
           </article>
         ))
       }

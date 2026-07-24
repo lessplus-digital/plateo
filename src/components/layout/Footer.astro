@@ -5,11 +5,11 @@ import Logo from '../ui/Logo.astro';
 const year = new Date().getFullYear();
 ---
 
-<!--
+{/*
   Comparte el navy con el CTA que va justo encima: el final de la página es un
   solo bloque oscuro, no dos franjas pegadas. De ahí que no lleve margen
   superior y sí un filete de separación.
--->
+*/}
 <footer class="bg-surface-inverse text-text-inverse">
   <div class="container-page">
     <div
@@ -85,9 +85,9 @@ const year = new Date().getFullYear();
       class="flex flex-col gap-2 border-t border-line-inverse py-6 sm:flex-row sm:items-center sm:justify-between"
     >
       <p class="text-xs text-navy-400">
-        © {year} {SITE.name}. Hecho en Bogotá.
+        © {year} {SITE.name}. Hecho en Medellín.
       </p>
-      <p class="text-xs text-navy-400">Precios en pesos colombianos (COP).</p>
+      <p class="text-xs text-navy-400">Desarrollado por LESS PLUS</p>
     </div>
   </div>
 </footer>

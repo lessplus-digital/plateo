@@ -1,97 +1,169 @@
 ---
+import type { ComponentProps } from 'astro/types';
 import Reveal from '../ui/Reveal.astro';
+import Icon from '../ui/Icon.astro';
+import Mark from '../ui/Mark.astro';
 import Doodle from '../ui/Doodle.astro';
 
 /**
- * "La carta": las funciones presentadas como el menú de un restaurante.
+ * Las siete capacidades del producto, nombradas y punto.
  *
- * Va sobre menta a sangre completa. Es el bloque de color más fuerte de la
- * página y por eso solo hay uno: rompe el blanco justo antes de la demo en
- * navy y le da al scroll un ritmo de tres tiempos (claro, menta, oscuro).
+ * Esta sección NO tiene que convencer: tiene que dar la medida de lo que hace
+ * el producto y pasarle el turno a <LiveDemo />, que es el momento fuerte de
+ * la página. Un cliente que llega agotado al demo ya no lo mira.
  *
- * Menta con texto navy da 13:1 de contraste. Al revés — texto menta sobre
- * blanco — daría 1.5:1 y sería ilegible. No lo inviertas.
+ * De ahí las dos reglas de las que no conviene salirse:
+ *
+ * 1. Dos o tres líneas por capacidad, nunca un párrafo. Lo justo para que se
+ *    entienda el mecanismo —qué hace y cómo—, y ni una frase más: lo demás lo
+ *    enseña el demo mucho mejor de lo que puede contarlo un texto.
+ * 2. Nada de cuadrícula de tarjetas iguales. Seis o siete tarjetas con icono,
+ *    título y párrafo del mismo largo es exactamente la forma que tiene una
+ *    página generada; además, cuenta que las siete cosas pesan igual, y no es
+ *    verdad. Aquí van en una lista con filetes, y solo la primera —el agente—
+ *    se sale de la norma con sus tres etiquetas.
+ *
+ * Antes esto era una cuadrícula con tarjeta navy, gráfica de barras y cuadros
+ * de color en menta y violeta. Se quitó todo: demasiada tinta y demasiado
+ * ruido para una sección de paso.
  */
-const PLATOS = [
+
+/** Lo que separa al agente de un bot de árbol de opciones. */
+const RASGOS = ['sin respuestas fijas', 'recuerda a cada cliente', 'cualquier idioma'];
+
+interface Capacidad {
+  /** El nombre sale del propio <Icon />, así no se pueden desincronizar. */
+  icon: ComponentProps<typeof Icon>['name'];
+  title: string;
+  body: string;
+  /** Solo el agente lleva etiquetas: es el producto, el resto es lo que hace. */
+  rasgos?: boolean;
+}
+
+const CAPACIDADES: Capacidad[] = [
   {
-    n: '01',
-    title: 'Toma el pedido sin que nadie conteste',
-    body: 'Responde en WhatsApp a cualquier hora con tu menú real y tus precios reales. Si algo se acabó, deja de ofrecerlo.',
+    icon: 'agente',
+    title: 'Agente de IA',
+    body: 'Entiende lo que le escriben, no un menú de opciones. Sigue el hilo de la conversación, consulta tu menú antes de responder y le entiende igual a quien manda audios o escribe con afán.',
+    rasgos: true,
   },
   {
-    n: '02',
-    title: 'Lo manda a cocina en segundos',
-    body: 'La comanda aparece en el tablero con sonido. Recibido, en preparación, en camino: todo el turno ve lo mismo.',
+    icon: 'pedido',
+    title: 'Pedidos',
+    body: 'Agrega, quita y cambia productos sobre la marcha, sugiere adiciones, calcula el total y confirma el comprobante de la transferencia. Llega a cocina ya cuadrado.',
   },
   {
-    n: '03',
-    title: 'Se acuerda de tus clientes',
-    body: 'Dirección, historial y cuánto ha gastado cada uno. La próxima vez no hay que preguntar nada dos veces.',
+    icon: 'reservas',
+    title: 'Reservas',
+    body: 'Aparta, reagenda y cancela mesas por chat, y manda el recordatorio antes de la hora. La agenda queda a la vista de todo el turno.',
   },
   {
-    n: '04',
-    title: 'Cuadra las mesas',
-    body: 'Reservas confirmadas por chat y visibles para el equipo. Se acabó la agenda de papel junto al teléfono.',
+    icon: 'atencion',
+    title: 'Respuestas',
+    body: 'Horarios, hasta dónde llega el domicilio, medios de pago, tiempos de entrega y cómo llegar. Las mismas veinte preguntas de siempre, sin sacar a nadie de la cocina.',
   },
   {
-    n: '05',
-    title: 'Te dice qué se está vendiendo',
-    body: 'Ventas del día, ticket promedio, horas pico y los platos que más salen. Sin exportar nada a Excel.',
+    icon: 'estadisticas',
+    title: 'Estadísticas',
+    body: 'Ventas del día, ticket promedio, horas pico y los platos que más salen. Para decidir cuánta masa dejar lista el viernes o a qué hora reforzar el turno.',
   },
   {
-    n: '06',
-    title: 'Los datos son del restaurante',
-    body: 'Una instancia dedicada por local. Sin marketplace de por medio, sin comisión por venta y sin alquilar tus clientes.',
+    icon: 'resenas',
+    title: 'Reseñas',
+    body: 'Pregunta cómo estuvo cuando el pedido acaba de llegar. A quien quedó contento le deja listo el camino a Google; si algo falló, te avisa a ti primero.',
+  },
+  {
+    icon: 'soporte',
+    title: 'Soporte',
+    body: 'Entras al chat y respondes tú cuando haga falta, sin perder el hilo de lo que ya venía diciendo el agente. Y si algo se enreda, nos escribes desde el panel.',
   },
 ];
 ---
 
-<section id="producto" class="scroll-mt-24 bg-accent py-24 text-navy-900 md:py-32">
+<section id="producto" class="scroll-mt-24 bg-surface-sunken py-24 md:py-32">
   <div class="container-page">
-    <div class="flex flex-wrap items-end justify-between gap-6">
-      <div class="max-w-2xl">
+    <div class="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+      {/* ===== Izquierda: el encabezado, quieto mientras pasa la lista ===== */}
+      <div class="lg:sticky lg:top-28 lg:self-start">
         <Reveal variant="fade">
-          <p class="text-xs font-semibold tracking-[0.18em] uppercase opacity-70">La carta</p>
+          <p class="text-xs font-semibold tracking-[0.18em] text-accent-2-ink uppercase">
+            El producto
+          </p>
         </Reveal>
 
         <Reveal as="h2" delay={70} class="mt-4 text-4xl font-semibold text-balance md:text-5xl">
-          Todo lo que pasa entre el «hola» y el domicilio entregado
+          Siete trabajos que se{' '}
+          <Mark variant="underline" tone="mint" delay={600}>automatizan</Mark>
+        </Reveal>
+
+        <Reveal delay={140} class="mt-6 text-lg text-text-muted text-pretty">
+          <p>
+            Todos dentro del WhatsApp que ya repartes. Ninguno le suma una pantalla nueva a
+            tu equipo, y ninguno cobra comisión por venta.
+          </p>
+        </Reveal>
+
+        <Reveal delay={200} class="mt-8 flex items-center gap-2">
+          <a
+            href="#en-vivo"
+            class="group inline-flex items-center gap-2 text-sm font-medium text-accent-2-ink underline-offset-4 hover:underline"
+          >
+            Míralo trabajando
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 16 16"
+              fill="none"
+              aria-hidden="true"
+              class="transition-transform duration-200 ease-out-cubic group-hover:translate-y-0.5"
+            >
+              <path
+                d="M8 2.5v11M3.5 9 8 13.5 12.5 9"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path>
+            </svg>
+          </a>
+
+          <Doodle shape="squiggle" tone="mint" width={72} rotate={-2} delay={640} class="ml-1" />
         </Reveal>
       </div>
 
-      <Reveal delay={140} class="hidden lg:block">
-        <Doodle shape="squiggle" tone="navy" width={140} rotate={-3} delay={420} />
-      </Reveal>
-    </div>
+      {/* ===== Derecha: la lista ===== */}
+      <ul>
+        {
+          CAPACIDADES.map((cap, i) => (
+            <Reveal
+              as="li"
+              delay={i * 55}
+              blur={6}
+              class="group border-t border-line first:border-t-0"
+            >
+              <div class="flex items-start gap-5 py-6 transition-transform duration-200 ease-out-cubic group-hover:translate-x-1">
+                <span class="mt-0.5 shrink-0 text-accent-ink" aria-hidden="true">
+                  <Icon name={cap.icon} size={24} />
+                </span>
 
-    <!--
-      Separadores punteados entre platos, como en una carta impresa. El borde
-      superior del primero lo pone el <ul>, así no hay que tratar aparte el
-      primer elemento en cada columna.
-    -->
-    <ul class="mt-14 grid gap-x-14 md:grid-cols-2">
-      {
-        PLATOS.map((plato, i) => (
-          <Reveal
-            as="li"
-            delay={i * 60}
-            blur={6}
-            class="border-t border-dashed border-navy-900/25 py-7"
-          >
-            <div class="flex gap-5">
-              <span class="mt-1 font-mono text-sm font-bold tabular-nums opacity-45">
-                {plato.n}
-              </span>
-              <div>
-                <h3 class="text-lg font-semibold text-balance">{plato.title}</h3>
-                <p class="mt-2 text-[0.95rem] leading-relaxed text-navy-800/85 text-pretty">
-                  {plato.body}
-                </p>
+                <div class="min-w-0">
+                  <h3 class="text-lg font-semibold">{cap.title}</h3>
+                  <p class="mt-1 text-[0.95rem] text-text-muted text-pretty">{cap.body}</p>
+
+                  {cap.rasgos && (
+                    <ul class="mt-3 flex flex-wrap gap-x-2 gap-y-1.5">
+                      {RASGOS.map((rasgo) => (
+                        <li class="rounded-full bg-accent-soft px-2.5 py-1 text-xs text-accent-ink">
+                          {rasgo}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
-            </div>
-          </Reveal>
-        ))
-      }
-    </ul>
+            </Reveal>
+          ))
+        }
+      </ul>
+    </div>
   </div>
 </section>

@@ -120,10 +120,10 @@ const TOTALS = { before: '$181.000', after: '$239.000' };
       </Reveal>
     </div>
 
-    <!--
+    {/*
       `data-demo` es la raíz que busca el script. Al arrancar añade
       `is-playing`, que oculta los mensajes para poder revelarlos por turnos.
-    -->
+    */}
     <Reveal variant="tilt" delay={220} blur={16} class="mt-14">
       <div
         data-demo
@@ -131,7 +131,7 @@ const TOTALS = { before: '$181.000', after: '$239.000' };
         data-total-after={TOTALS.after}
         class="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-line-inverse bg-navy-950 shadow-2xl shadow-black/40"
       >
-        <!-- Barra de ventana del panel -->
+        {/* Barra de ventana del panel */}
         <div class="flex items-center gap-3 border-b border-line-inverse px-4 py-3">
           <div class="flex gap-1.5" aria-hidden="true">
             <span class="size-2.5 rounded-full bg-navy-700"></span>
@@ -148,7 +148,7 @@ const TOTALS = { before: '$181.000', after: '$239.000' };
         </div>
 
         <div class="grid gap-px bg-line-inverse lg:grid-cols-[22rem_1fr]">
-          <!-- ============ Izquierda: la conversación ============ -->
+          {/* ============ Izquierda: la conversación ============ */}
           <div class="bg-navy-950 p-5">
             <div class="mb-4 flex items-center gap-3">
               <div
@@ -164,12 +164,12 @@ const TOTALS = { before: '$181.000', after: '$239.000' };
               <span class="text-xs text-navy-400">WhatsApp</span>
             </div>
 
-            <!--
+            {/*
               Alto fijo: la conversación crece hacia arriba y los mensajes
               viejos se van saliendo por el borde superior, como en un chat de
               verdad. Sin alto fijo, el bloque entero daría tumbos en cada
               vuelta del bucle.
-            -->
+            */}
             <div
               data-chat
               class="flex h-[27rem] flex-col justify-end gap-2.5 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_3rem)]"
@@ -226,7 +226,7 @@ const TOTALS = { before: '$181.000', after: '$239.000' };
                 ))
               }
 
-              <!-- "Escribiendo…". Solo aparece durante la reproducción. -->
+              {/* "Escribiendo…". Solo aparece durante la reproducción. */}
               <div
                 data-typing
                 hidden
@@ -244,7 +244,7 @@ const TOTALS = { before: '$181.000', after: '$239.000' };
             </div>
           </div>
 
-          <!-- ============ Derecha: el tablero de cocina ============ -->
+          {/* ============ Derecha: el tablero de cocina ============ */}
           <div class="bg-navy-950 p-5">
             <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
               <p class="text-sm font-medium text-text-inverse">Pedidos de hoy</p>

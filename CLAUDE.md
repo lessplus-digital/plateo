@@ -123,12 +123,20 @@ Escribe siempre `bg-surface` / `text-text-muted`, no `bg-white` / `text-navy-600
 Gracias a esa indirección, **añadir modo oscuro es redefinir el bloque `:root` de
 `global.css` y nada más** — ni tocar componentes ni recompilar clases.
 
-Dos trampas de contraste, ya comprobadas:
+Tres trampas de contraste, ya comprobadas:
 
 - La menta sobre blanco da 1.5:1. **Es color de relleno, con texto navy encima**,
   nunca color de texto. Si necesitas menta legible sobre claro, usa `accent-ink`.
 - `navy-500` sobre blanco se queda en 3.6:1. Para texto secundario, `navy-600`
   (5:1), que es lo que ya apunta `--text-muted`.
+- **La menta no sirve como fondo de sección.** Se probó en Features a sangre
+  completa y se quitó: en cuanto el texto secundario baja de opacidad —que es
+  justo lo que pide una superficie tan saturada— el contraste se desploma, y
+  un bloque tan grande en un color tan vivo cansa la vista. La menta va en
+  acentos: rellenos pequeños, trazos de `<Mark />` y el botón primario.
+
+Para dar peso a un bloque claro, la herramienta es una **tarjeta en navy**
+dentro de la sección (ver la del agente en Features), no teñir la sección entera.
 
 ### Tipografía
 
@@ -154,8 +162,10 @@ Lo que aleja la web de una plantilla genérica, y conviene no diluir:
   frases cortas (lee el aviso del componente sobre el ajuste de línea).
 - `<Doodle />` — flechas y destellos dibujados que guían la lectura.
 - `<Sticker />` — etiqueta girada, con sombra dura. Una por pantalla.
-- `<Ticket />` — la comanda de papel. Es el objeto que Plateo reemplaza, y por
-  eso aparece en el hero y en el testimonio.
+- `<Ticket />` — la comanda de papel, el objeto que Plateo reemplaza.
+- `<Icon />` — los seis glifos del producto, dibujados a mano sobre 24x24. **No
+  instales un set de iconos**: Lucide y Heroicons son los mismos de media web y
+  delatan la plantilla al instante.
 
 Todo son SVG propios que se dibujan solos al entrar en pantalla (`data-draw` +
 `pathLength="1"`). Nada de librerías de iconos ni de imágenes.
