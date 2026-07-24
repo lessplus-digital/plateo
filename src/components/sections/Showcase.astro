@@ -5,56 +5,69 @@ import Reveal from '../ui/Reveal.astro';
 /**
  * Vitrina del producto. Cada slide debería llevar un <VideoLoop /> con la
  * grabación real de esa pantalla; por ahora son marcadores de posición.
+ *
+ * TODO: grabar las cuatro pantallas y sustituir los marcadores. El comando de
+ * ffmpeg está documentado dentro de VideoLoop.astro.
  */
 const SLIDES = [
   {
-    title: 'Conversación en WhatsApp',
-    body: 'El cliente escribe, el asistente responde con el menú real y confirma el pedido.',
-  },
-  {
     title: 'Tablero de pedidos',
-    body: 'El pedido entra a cocina en segundos y avanza por columnas hasta la entrega.',
+    body: 'La pantalla que vive abierta en la cocina durante todo el turno.',
   },
   {
-    title: 'Ficha de cliente',
-    body: 'Historial completo, dirección guardada y cuánto ha gastado.',
+    title: 'Ficha del cliente',
+    body: 'Qué pidió, cuándo, a dónde se le llevó y cuánto lleva gastado.',
   },
   {
-    title: 'Estadísticas del día',
-    body: 'Ventas, ticket promedio y qué se está vendiendo ahora mismo.',
+    title: 'Menú y disponibilidad',
+    body: 'Se acabó la hawaiana: se apaga desde el celular y el bot deja de ofrecerla.',
+  },
+  {
+    title: 'Cierre del día',
+    body: 'Ventas, ticket promedio y los platos que más salieron, sin cuadrar nada a mano.',
   },
 ];
 ---
 
-<section id="como-funciona" class="scroll-mt-24 py-24 md:py-32">
+<section class="py-24 md:py-32">
   <div class="container-page">
-    <Reveal>
-      <h2 class="max-w-2xl text-4xl font-semibold tracking-tight text-balance md:text-5xl">
-        Así se ve por dentro
-      </h2>
-      <p class="mt-4 max-w-xl text-lg text-ink-300 text-pretty">
-        Nada de capturas retocadas: estas son las pantallas que usa el equipo todos los días.
-      </p>
-    </Reveal>
+    <div class="max-w-2xl">
+      <Reveal variant="fade">
+        <p class="text-xs font-semibold tracking-[0.18em] text-accent-2-ink uppercase">
+          Por dentro
+        </p>
+      </Reveal>
+
+      <Reveal as="h2" delay={70} class="mt-4 text-4xl font-semibold text-balance md:text-5xl">
+        Las cuatro pantallas que de verdad se usan
+      </Reveal>
+
+      <Reveal delay={140} class="mt-5 text-lg text-text-muted text-pretty">
+        <p>
+          No hay veinte módulos ni un menú lateral con cosas que nadie abre. Estas son
+          todas.
+        </p>
+      </Reveal>
+    </div>
   </div>
 
   <!-- El carrusel se sale del contenedor a propósito: sugiere que hay más. -->
-  <Reveal variant="fade" delay={120} class="container-page mt-12">
+  <Reveal variant="fade" delay={180} class="container-page mt-12">
     <Carousel label="Pantallas del producto" class="mask-edges">
       {
         SLIDES.map(({ title, body }) => (
-          <article class="w-[85vw] shrink-0 snap-start sm:w-[28rem]">
-            <div class="aspect-[4/3] overflow-hidden rounded-xl border border-ink-800 bg-gradient-to-b from-ink-900 to-ink-950">
+          <article class="w-[82vw] shrink-0 snap-start sm:w-[27rem]">
+            <div class="aspect-[4/3] overflow-hidden rounded-xl border border-line bg-surface-sunken">
               {/*
                 TODO: sustituir por
                 <VideoLoop src="/videos/x.mp4" webm="/videos/x.webm"
                            poster="/videos/x.jpg" width={1280} height={960}
                            label={title} class="size-full object-cover" />
               */}
-              <div class="grid h-full place-items-center text-xs text-ink-500">{title}</div>
+              <div class="grid h-full place-items-center text-xs text-text-faint">{title}</div>
             </div>
-            <h3 class="mt-4 text-base font-medium">{title}</h3>
-            <p class="mt-1 text-sm text-ink-300">{body}</p>
+            <h3 class="mt-4 text-base font-semibold">{title}</h3>
+            <p class="mt-1 text-sm text-text-muted">{body}</p>
           </article>
         ))
       }

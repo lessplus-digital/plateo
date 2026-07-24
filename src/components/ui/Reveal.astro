@@ -4,29 +4,52 @@
  * Coste: 0 KB extra — reutiliza el observer global de scripts/reveal.ts.
  *
  * <Reveal delay={120} variant="left">…</Reveal>
+ *
+ * El elemento entra desenfocado y se enfoca mientras se desplaza. Ese
+ * desenfoque es lo que da la sensación de fluidez: sin él la entrada se lee
+ * como un salto. La referencia lo consigue con GSAP (~70 KB); aquí sale de
+ * una transición CSS.
  */
 interface Props {
   /** Etiqueta a renderizar. Útil para no romper la semántica (li, section…). */
   as?: keyof HTMLElementTagNameMap;
-  /** Retardo en ms. Escalona items de una grilla: delay={i * 80}. */
+  /** Retardo en ms. Escalona items de una grilla: delay={i * 70}. */
   delay?: number;
-  variant?: 'up' | 'down' | 'left' | 'right' | 'fade' | 'scale';
+  variant?: 'up' | 'down' | 'left' | 'right' | 'fade' | 'scale' | 'tilt';
+  /**
+   * Desenfoque de salida en px. Súbelo en bloques grandes (el marco del
+   * producto) y bájalo a 0 en textos pequeños, donde solo emborrona.
+   */
+  blur?: number;
   class?: string;
 }
 
-const { as: Tag = 'div', delay = 0, variant = 'up', class: className } = Astro.props;
+const {
+  as: Tag = 'div',
+  delay = 0,
+  variant = 'up',
+  blur,
+  class: className,
+} = Astro.props;
 
 // Cada variante solo cambia las custom properties que lee el CSS.
 const VARIANTS: Record<NonNullable<Props['variant']>, Record<string, string>> = {
-  up: { '--reveal-y': '1.75rem' },
-  down: { '--reveal-y': '-1.75rem' },
-  left: { '--reveal-x': '-1.75rem', '--reveal-y': '0' },
-  right: { '--reveal-x': '1.75rem', '--reveal-y': '0' },
+  up: { '--reveal-y': '2rem' },
+  down: { '--reveal-y': '-2rem' },
+  left: { '--reveal-x': '-2rem', '--reveal-y': '0' },
+  right: { '--reveal-x': '2rem', '--reveal-y': '0' },
   fade: { '--reveal-y': '0' },
   scale: { '--reveal-y': '0', '--reveal-scale': '0.96' },
+  // Entrada en perspectiva para las capturas de producto: el marco cae hacia
+  // su sitio en vez de deslizarse. Se usa una sola vez por página.
+  tilt: { '--reveal-y': '3rem', '--reveal-scale': '0.94', '--reveal-rotate': '-1.2deg' },
 };
 
-const style = { ...VARIANTS[variant], '--reveal-delay': `${delay}ms` };
+const style = {
+  ...VARIANTS[variant],
+  '--reveal-delay': `${delay}ms`,
+  ...(blur !== undefined ? { '--reveal-blur': `${blur}px` } : {}),
+};
 ---
 
 <Tag data-reveal class={className} style={style}>

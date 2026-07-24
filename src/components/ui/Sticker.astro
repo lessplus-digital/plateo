@@ -1,0 +1,42 @@
+---
+/**
+ * Etiqueta girada, como una pegatina puesta a mano sobre la página.
+ *
+ * Sirve para el dato que quieres que se lea antes que el titular
+ * ("sin comisión por venta"). Va girada a propósito: alineada perfectamente
+ * pierde toda la gracia y se convierte en un badge más.
+ *
+ * Úsala con cuentagotas — dos pegatinas en la misma pantalla se anulan.
+ */
+interface Props {
+  tone?: 'mint' | 'violet' | 'navy' | 'outline';
+  /** Giro en grados. Entre -8 y 8; más allá estorba la lectura. */
+  rotate?: number;
+  /** Tipografía manuscrita en vez de la de UI. Para notas al margen. */
+  hand?: boolean;
+  class?: string;
+}
+
+const { tone = 'mint', rotate = -4, hand = false, class: className } = Astro.props;
+
+const TONES = {
+  mint: 'bg-accent text-navy-900 border-navy-900',
+  violet: 'bg-accent-2 text-white border-navy-900',
+  navy: 'bg-navy-900 text-white border-navy-900',
+  outline: 'bg-surface text-text border-navy-900',
+} as const;
+---
+
+<span
+  class:list={[
+    'inline-flex items-center gap-1.5 rounded-full border-2 px-3.5 py-1 whitespace-nowrap',
+    // La sombra dura, sin difuminar, es lo que la hace parecer pegada encima.
+    'shadow-[2px_2px_0_0_var(--color-navy-900)]',
+    hand ? 'handwritten' : 'text-xs font-semibold tracking-tight',
+    TONES[tone],
+    className,
+  ]}
+  style={{ transform: `rotate(${rotate}deg)` }}
+>
+  <slot />
+</span>

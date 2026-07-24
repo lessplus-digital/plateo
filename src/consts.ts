@@ -16,7 +16,8 @@ export const SITE = {
   locale: 'es_CO',
   /** Imagen de 1200x630 en /public. Es lo que se ve al compartir en WhatsApp/LinkedIn. */
   ogImage: '/og.jpg',
-  themeColor: '#14171f',
+  /** Navy de marca (#211951). Es el color de la barra del navegador en móvil. */
+  themeColor: '#211951',
 } as const;
 
 export const LINKS = {
@@ -28,7 +29,7 @@ export const LINKS = {
 } as const;
 
 export const NAV: ReadonlyArray<{ label: string; href: string }> = [
-  { label: 'Producto', href: '#producto' },
-  { label: 'Cómo funciona', href: '#como-funciona' },
-  { label: 'Precios', href: '#precios' },
+  { label: 'Qué hace', href: '#producto' },
+  { label: 'Verlo en vivo', href: '#en-vivo' },
+  { label: 'Puesta en marcha', href: '#como-funciona' },
 ];

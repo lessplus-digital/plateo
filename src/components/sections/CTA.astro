@@ -1,36 +1,63 @@
 ---
 import Button from '../ui/Button.astro';
 import Reveal from '../ui/Reveal.astro';
+import Mark from '../ui/Mark.astro';
+import Doodle from '../ui/Doodle.astro';
+import Logo from '../ui/Logo.astro';
 import { LINKS } from '../../consts';
+
+/**
+ * Cierre. Va en navy y pegado al footer (sin margen entre ambos), de forma que
+ * el final de la página sea un solo bloque oscuro y no dos franjas distintas.
+ */
 ---
 
-<section id="precios" class="container-page scroll-mt-24 py-24 md:py-32">
-  <Reveal variant="scale">
-    <div
-      class="relative overflow-hidden rounded-3xl border border-ink-800 bg-ink-900/50 px-8 py-16 text-center md:px-16 md:py-24"
-    >
-      <div
-        class="pointer-events-none absolute inset-x-0 -top-40 h-80 bg-[radial-gradient(circle,var(--color-brand-600)_0%,transparent_65%)] opacity-20 blur-3xl"
-        aria-hidden="true"
-      >
-      </div>
+<section id="precios" class="scroll-mt-24 bg-surface-inverse pt-24 pb-28 md:pt-32 md:pb-36">
+  <div class="container-page">
+    <div class="relative mx-auto max-w-3xl text-center">
+      <!-- El isotipo enorme, casi transparente, de marca de agua -->
+      <Logo
+        variant="mark"
+        height={220}
+        decorative
+        class="pointer-events-none absolute -top-24 left-1/2 -z-0 -translate-x-1/2 text-white/[0.04]"
+      />
 
-      <h2 class="mx-auto max-w-2xl text-4xl font-semibold tracking-tight text-balance md:text-5xl">
-        Te mostramos Plateo con el menú de tu restaurante
-      </h2>
-      <p class="mx-auto mt-5 max-w-xl text-lg text-ink-300 text-pretty">
-        Cargamos tus productos reales y te dejamos probar el bot desde tu propio WhatsApp.
-        Sin instalar nada.
-      </p>
+      <div class="relative">
+        <Reveal variant="fade">
+          <Doodle shape="sparkle" tone="mint" width={38} delay={380} class="mx-auto" />
+        </Reveal>
 
-      <div class="mt-10 flex flex-wrap justify-center gap-3">
-        <Button href={LINKS.whatsapp} variant="primary" size="lg" external>
-          Escribir por WhatsApp
-        </Button>
-        <Button href={`mailto:${LINKS.email}`} variant="secondary" size="lg">
-          Escribir un correo
-        </Button>
+        <Reveal
+          as="h2"
+          delay={80}
+          blur={12}
+          class="mt-6 text-4xl font-semibold text-balance text-text-inverse md:text-6xl"
+        >
+          Te lo montamos con
+          <Mark variant="underline" tone="mint" delay={600}>tu propio menú</Mark>
+        </Reveal>
+
+        <Reveal delay={160} class="mx-auto mt-6 max-w-xl text-lg text-text-inverse-muted text-pretty">
+          <p>
+            Nos mandas la carta, la cargamos y te dejamos pedir desde tu WhatsApp como si
+            fueras un cliente más. Sin instalar nada y sin compromiso.
+          </p>
+        </Reveal>
+
+        <Reveal delay={230} class="mt-10 flex flex-wrap justify-center gap-3">
+          <Button href={LINKS.whatsapp} variant="primary" size="lg" external arrow>
+            Escribirnos por WhatsApp
+          </Button>
+          <Button href={`mailto:${LINKS.email}`} variant="inverse" size="lg">
+            Prefiero un correo
+          </Button>
+        </Reveal>
+
+        <Reveal delay={300} class="mt-6">
+          <p class="handwritten text-text-inverse-muted">contestamos nosotros, no un bot</p>
+        </Reveal>
       </div>
     </div>
-  </Reveal>
+  </div>
 </section>

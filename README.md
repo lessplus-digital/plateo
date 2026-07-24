@@ -42,7 +42,7 @@ public/                # robots.txt, og.jpg, /videos, favicon
 - [ ] URL de login, WhatsApp comercial y correo en `src/consts.ts`
 - [ ] `public/og.jpg` de 1200×630
 - [ ] Videos del producto en `public/videos/` (MP4 + WebM — nunca GIF)
-- [ ] Paleta `brand-*` definitiva en `src/styles/global.css`
+- [ ] Testimonio real en `src/components/sections/Testimonial.astro` (cita, cifras y foto)
 
 ## Despliegue
 

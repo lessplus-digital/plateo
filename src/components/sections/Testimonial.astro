@@ -1,0 +1,90 @@
+---
+import Reveal from '../ui/Reveal.astro';
+import Ticket from '../ui/Ticket.astro';
+import Doodle from '../ui/Doodle.astro';
+
+/**
+ * Caso de éxito. Es el ÚNICO sitio de la web donde aparece la marca de un
+ * cliente: Vera es cliente de Plateo, no es Plateo. Si algún día hay más
+ * casos, este bloque se convierte en varios; la regla no cambia.
+ *
+ * Los números van en una comanda, no en tres tarjetas de estadística: es el
+ * mismo objeto del hero cerrando el círculo, y de paso evita la fila de
+ * métricas gigantes que lleva toda landing.
+ *
+ * TODO: sustituir la cita y las cifras por las reales, con permiso del cliente.
+ */
+const CIFRAS = [
+  { label: 'Pedidos al mes por WhatsApp', value: '1.240' },
+  { label: 'Menos tiempo tomando pedidos', value: '−70%' },
+  { label: 'Pedidos perdidos desde marzo', value: '0' },
+];
+---
+
+<section class="bg-surface-sunken py-24 md:py-32">
+  <div class="container-page">
+    <div class="grid items-center gap-14 lg:grid-cols-[1.15fr_0.85fr]">
+      <div>
+        <Reveal variant="fade">
+          <p class="text-xs font-semibold tracking-[0.18em] text-accent-2-ink uppercase">
+            Caso real
+          </p>
+        </Reveal>
+
+        <Reveal as="blockquote" delay={80} blur={10} class="mt-6">
+          <p class="font-display text-3xl leading-[1.25] font-medium text-balance md:text-[2.4rem]">
+            «Antes perdíamos pedidos los viernes porque nadie alcanzaba a contestar el
+            teléfono. Ahora el que contesta es Plateo, y la cocina solo mira el tablero.»
+          </p>
+        </Reveal>
+
+        <Reveal delay={160} class="mt-8 flex items-center gap-4">
+          <!-- TODO: foto real del propietario cuando la tengamos -->
+          <div
+            class="grid size-12 shrink-0 place-items-center rounded-full bg-navy-900 font-display text-base font-semibold text-accent"
+            aria-hidden="true"
+          >
+            DV
+          </div>
+          <div>
+            <p class="font-medium">Daniel V.</p>
+            <p class="text-sm text-text-muted">Propietario, Pizzería Vera · Bogotá</p>
+          </div>
+        </Reveal>
+      </div>
+
+      <div class="relative mx-auto w-full max-w-xs lg:mx-0 lg:justify-self-end">
+        <Doodle
+          shape="corner"
+          tone="violet"
+          width={54}
+          delay={520}
+          class="absolute -top-7 -left-7 hidden sm:block"
+        />
+
+        <Reveal variant="tilt" delay={220} blur={12}>
+          <Ticket label="Cierre de mes" code="VERA" rotate={2}>
+            <dl class="space-y-4">
+              {
+                CIFRAS.map((cifra) => (
+                  <div>
+                    <dt class="text-[0.7rem] leading-tight tracking-wide text-text-muted uppercase">
+                      {cifra.label}
+                    </dt>
+                    <dd class="tnum mt-0.5 font-display text-3xl font-semibold">{cifra.value}</dd>
+                  </div>
+                ))
+              }
+            </dl>
+
+            <p
+              class="mt-5 border-t border-dashed border-line-strong pt-3 text-[0.65rem] text-text-faint"
+            >
+              Datos del propio panel, últimos 30 días.
+            </p>
+          </Ticket>
+        </Reveal>
+      </div>
+    </div>
+  </div>
+</section>

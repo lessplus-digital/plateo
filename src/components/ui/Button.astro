@@ -2,13 +2,25 @@
 /**
  * Jerarquía de botones. Regla: UN solo `primary` visible por pantalla.
  * Siempre renderiza <a> — en esta landing todo CTA es navegación.
+ *
+ * El primario lleva un borde inferior sólido en navy que se hunde al pulsar.
+ * Es deliberado: un botón con sombra difusa es el gesto por defecto de
+ * cualquier plantilla, y este tiene que sentirse como una tecla física.
  */
 interface Props {
   href: string;
-  variant?: 'primary' | 'secondary' | 'ghost';
-  size?: 'md' | 'lg';
+  /**
+   * - `primary`   menta con texto navy. El CTA de verdad.
+   * - `secondary` contorno navy sobre fondo claro.
+   * - `inverse`   contorno claro, para usar dentro de bloques navy.
+   * - `ghost`     solo texto.
+   */
+  variant?: 'primary' | 'secondary' | 'inverse' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
   /** Añade target/rel de enlace externo. */
   external?: boolean;
+  /** Flecha al final que se desplaza en hover. */
+  arrow?: boolean;
   class?: string;
 }
 
@@ -17,19 +29,34 @@ const {
   variant = 'primary',
   size = 'md',
   external = false,
+  arrow = false,
   class: className,
 } = Astro.props;
 
 const BASE =
-  'inline-flex items-center justify-center gap-2 rounded-full font-medium transition duration-200 active:scale-[0.98]';
+  'group inline-flex items-center justify-center gap-2 rounded-full font-medium transition-[transform,box-shadow,background-color,border-color,color] duration-200 ease-out-cubic';
 
 const VARIANTS = {
-  primary: 'bg-brand-500 text-ink-950 hover:bg-brand-400',
-  secondary: 'border border-ink-700 bg-ink-900/60 text-ink-100 hover:border-ink-500',
-  ghost: 'text-ink-300 hover:text-ink-100',
+  primary: [
+    'bg-accent text-navy-900 shadow-[0_3px_0_0_var(--color-navy-900)]',
+    'hover:-translate-y-0.5 hover:bg-mint-300 hover:shadow-[0_5px_0_0_var(--color-navy-900)]',
+    'active:translate-y-[3px] active:shadow-none',
+  ].join(' '),
+  secondary: [
+    'border border-line-strong bg-surface text-text',
+    'hover:border-navy-900 hover:-translate-y-0.5',
+    'active:translate-y-0',
+  ].join(' '),
+  inverse: [
+    'border border-line-inverse text-text-inverse',
+    'hover:border-accent hover:text-accent hover:-translate-y-0.5',
+    'active:translate-y-0',
+  ].join(' '),
+  ghost: 'text-text-muted hover:text-text',
 } as const;
 
 const SIZES = {
+  sm: 'px-4 py-2 text-sm',
   md: 'px-5 py-2.5 text-sm',
   lg: 'px-7 py-3.5 text-base',
 } as const;
@@ -41,4 +68,24 @@ const SIZES = {
   {...external ? { target: '_blank', rel: 'noopener noreferrer' } : {}}
 >
   <slot />
+  {
+    arrow && (
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        aria-hidden="true"
+        class="transition-transform duration-200 ease-out-cubic group-hover:translate-x-1"
+      >
+        <path
+          d="M2.5 8h10M9 4.5 12.5 8 9 11.5"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    )
+  }
 </a>

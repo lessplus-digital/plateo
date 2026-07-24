@@ -1,21 +1,29 @@
 ---
 import { NAV, SITE, LINKS } from '../../consts';
 import Button from '../ui/Button.astro';
+import Logo from '../ui/Logo.astro';
 ---
 
 <header
-  class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition-colors duration-300 data-[scrolled]:border-ink-800 data-[scrolled]:bg-ink-950/80 data-[scrolled]:backdrop-blur-xl"
+  class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition-colors duration-300 data-[scrolled]:border-line data-[scrolled]:bg-surface/85 data-[scrolled]:backdrop-blur-xl"
   data-header
 >
   <div class="container-page flex h-18 items-center justify-between gap-6">
-    <a href="/" class="text-lg font-semibold tracking-tight" aria-label={`${SITE.name} — inicio`}>
-      {SITE.name}
+    <a
+      href="/"
+      class="shrink-0 text-navy-900 transition-opacity hover:opacity-80"
+      aria-label={`${SITE.name} — inicio`}
+    >
+      <Logo variant="lockup" height={22} decorative />
     </a>
 
     <nav class="hidden items-center gap-8 md:flex" aria-label="Principal">
       {
         NAV.map(({ label, href }) => (
-          <a href={href} class="text-sm text-ink-300 transition-colors hover:text-ink-100">
+          <a
+            href={href}
+            class="relative text-sm text-text-muted transition-colors hover:text-text"
+          >
             {label}
           </a>
         ))
@@ -23,10 +31,10 @@ import Button from '../ui/Button.astro';
     </nav>
 
     <div class="flex items-center gap-2">
-      <Button href={LINKS.login} variant="ghost" external class="hidden sm:inline-flex">
-        Iniciar sesión
+      <Button href={LINKS.login} variant="ghost" size="sm" external class="hidden sm:inline-flex">
+        Entrar al panel
       </Button>
-      <Button href={LINKS.whatsapp} variant="primary" external>Pedir demo</Button>
+      <Button href={LINKS.whatsapp} variant="primary" size="sm" external>Ver una demo</Button>
     </div>
   </div>
 </header>

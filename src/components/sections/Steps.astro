@@ -1,0 +1,101 @@
+---
+import Reveal from '../ui/Reveal.astro';
+import Doodle from '../ui/Doodle.astro';
+import Mark from '../ui/Mark.astro';
+import Sticker from '../ui/Sticker.astro';
+
+/**
+ * Puesta en marcha, en tres pasos.
+ *
+ * Las flechas dibujadas entre pasos son la razón de que este bloque no sea una
+ * grilla de tres tarjetas más: guían la lectura en zigzag y solo aparecen en
+ * escritorio, donde hay sitio real entre columnas. En móvil los pasos van uno
+ * debajo de otro y la flecha sobraría.
+ */
+const PASOS = [
+  {
+    n: '1',
+    title: 'Nos pasas tu menú',
+    body: 'Una foto de la carta o el Excel que ya tengas. Lo montamos nosotros, con tus precios y tus adiciones.',
+    time: 'Un día',
+  },
+  {
+    n: '2',
+    title: 'Conectamos tu WhatsApp',
+    body: 'El mismo número que ya reparten tus clientes. No hay que avisar a nadie ni imprimir nada nuevo.',
+    time: 'Una tarde',
+  },
+  {
+    n: '3',
+    title: 'La cocina abre el tablero',
+    body: 'En un celular viejo, en la tablet o en el computador de la caja. Si sabe usar WhatsApp, sabe usar esto.',
+    time: 'Diez minutos',
+  },
+];
+---
+
+<section id="como-funciona" class="scroll-mt-24 py-24 md:py-32">
+  <div class="container-page">
+    <div class="max-w-2xl">
+      <Reveal variant="fade">
+        <p class="text-xs font-semibold tracking-[0.18em] text-accent-2-ink uppercase">
+          Puesta en marcha
+        </p>
+      </Reveal>
+
+      <Reveal as="h2" delay={70} class="mt-4 text-4xl font-semibold text-balance md:text-5xl">
+        Lo dejamos andando en
+        <Mark variant="circle" tone="violet" delay={560}>una semana</Mark>
+      </Reveal>
+
+      <Reveal delay={140} class="mt-6 text-lg text-text-muted text-pretty">
+        <p>
+          No hay instalación, ni capacitación de tres días, ni un equipo nuevo que comprar.
+          Tu cocina sigue trabajando mientras tanto.
+        </p>
+      </Reveal>
+    </div>
+
+    <ol class="relative mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
+      {
+        PASOS.map((paso, i) => (
+          <Reveal as="li" delay={i * 110} class="relative">
+            <div class="flex items-center gap-3">
+              <span class="grid size-9 shrink-0 place-items-center rounded-full bg-navy-900 font-display text-sm font-semibold text-white">
+                {paso.n}
+              </span>
+              <span class="text-xs tracking-[0.14em] text-text-faint uppercase">{paso.time}</span>
+            </div>
+
+            <h3 class="mt-5 text-xl font-semibold text-balance">{paso.title}</h3>
+            <p class="mt-2.5 text-[0.95rem] leading-relaxed text-text-muted text-pretty">
+              {paso.body}
+            </p>
+
+            {/* Flecha hacia el paso siguiente. La última no lleva. */}
+            {i < PASOS.length - 1 && (
+              <Doodle
+                shape="arrow-curve"
+                tone="mint"
+                width={88}
+                rotate={i % 2 === 0 ? -4 : 6}
+                flip={i % 2 !== 0}
+                delay={420 + i * 110}
+                class="absolute -top-2 -right-14 hidden md:block"
+              />
+            )}
+          </Reveal>
+        ))
+      }
+    </ol>
+
+    <Reveal delay={340} class="mt-14 flex flex-wrap items-center gap-4 border-t border-line pt-8">
+      <Sticker tone="outline" rotate={-2} hand>
+        y si no te sirve, te devolvemos el mes
+      </Sticker>
+      <p class="text-sm text-text-muted">
+        Sin contrato de permanencia. Se cancela escribiendo por el mismo WhatsApp.
+      </p>
+    </Reveal>
+  </div>
+</section>

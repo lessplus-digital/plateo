@@ -1,0 +1,147 @@
+---
+/**
+ * Trazo de marcador sobre una palabra o expresión corta, dibujado a mano.
+ *
+ *   Tu cocina <Mark>nunca</Mark> vuelve a perder un pedido
+ *
+ * El SVG se estira al ancho real del texto (`preserveAspectRatio="none"`), así
+ * que el trazo queda pegado a la palabra sea cual sea su longitud y no hay que
+ * calcular nada por sitio de uso. La ligera deformación al estirarse es
+ * justamente lo que hace que no parezcan dos trazos idénticos.
+ *
+ * Se dibuja solo al entrar en pantalla: reutiliza el observer global de
+ * scripts/reveal.ts (0 KB extra) mediante el atributo `data-reveal`.
+ *
+ * Dos reglas de uso:
+ *
+ * 1. Como mucho UNA marca por titular. Dos compiten entre ellas y el énfasis
+ *    se pierde.
+ * 2. Marca frases CORTAS, de una o dos palabras. El envoltorio es
+ *    `inline-block`, así que si la frase no cabe en el ancho disponible parte
+ *    por dentro y el trazo acaba subrayando el bloque entero en vez de la
+ *    última línea. En un h1 a tamaño móvil eso pasa a partir de unos 12
+ *    caracteres.
+ */
+interface Props {
+  /**
+   * - `underline`  un trazo por debajo. El de siempre.
+   * - `double`     dos trazos, para el énfasis más fuerte de la página.
+   * - `circle`     un óvalo alrededor, como quien rodea algo en una libreta.
+   * - `highlight`  barrido de resaltador por detrás del texto.
+   * - `strike`     tachado, para lo que Plateo deja atrás.
+   */
+  variant?: 'underline' | 'double' | 'circle' | 'highlight' | 'strike';
+  /** Color del trazo. Por defecto la menta de marca. */
+  tone?: 'mint' | 'violet' | 'navy';
+  /** Retardo del dibujado en ms. Úsalo para que entre después del titular. */
+  delay?: number;
+  class?: string;
+}
+
+const { variant = 'underline', tone = 'mint', delay = 260, class: className } = Astro.props;
+
+const TONE = {
+  mint: 'text-accent',
+  violet: 'text-accent-2',
+  navy: 'text-text',
+} as const;
+
+/*
+  Cada trazo está dibujado a mano alzada: los puntos de control no son
+  simétricos y el trazo sobrepasa por los extremos, que es lo que separa un
+  garabato real de un `border-bottom` con curvatura.
+*/
+const STROKES: Record<string, { box: string; d: string[]; extra?: string }> = {
+  underline: {
+    box: '0 0 300 16',
+    d: ['M5,10.5 C62,4.5 128,3.2 190,6.4 C232,8.5 268,11.8 296,7.2'],
+  },
+  double: {
+    box: '0 0 300 22',
+    d: [
+      'M5,8.5 C62,2.5 128,1.4 190,4.6 C232,6.6 268,9.8 296,5.4',
+      'M14,17.5 C74,13 140,12.4 202,14.2 C238,15.2 266,17 291,14.6',
+    ],
+  },
+  circle: {
+    box: '0 0 320 92',
+    // Empieza y termina arriba a la derecha, cruzándose: así se cierra un óvalo a mano.
+    d: [
+      'M236,12 C154,-1 62,3 26,25 C-7,45 20,73 94,83 C182,95 284,82 305,55 C319,37 296,19 254,11',
+    ],
+  },
+  highlight: {
+    box: '0 0 300 40',
+    d: ['M8,22 C90,14 210,14 292,20'],
+  },
+  strike: {
+    box: '0 0 300 14',
+    d: ['M6,9.5 C74,5.5 156,4.6 232,6.2 C262,6.8 282,8 295,6.4'],
+  },
+};
+
+const stroke = STROKES[variant];
+
+// El resaltador es un brochazo ancho por detrás del texto; el resto son trazos
+// finos por delante. De ahí que cambien grosor, opacidad y z-index.
+const isHighlight = variant === 'highlight';
+
+/*
+  El grosor va en `em` y por CSS, no en el atributo `stroke-width`: así el
+  trazo crece con la tipografía que marca. Un valor fijo en px se vería
+  correcto en el h1 y como un borrón en un párrafo.
+
+  Hace falta `vector-effect="non-scaling-stroke"` porque el SVG se estira en
+  horizontal; sin él, un trazo bajo una palabra larga saldría mucho más fino
+  que el mismo trazo bajo una palabra corta.
+*/
+const WIDTH = {
+  underline: '0.075em',
+  double: '0.06em',
+  circle: '0.045em',
+  highlight: '1.05em',
+  strike: '0.07em',
+} as const;
+
+const GEOMETRY = {
+  underline: 'top-full left-0 h-[0.42em] w-full -mt-[0.1em]',
+  double: 'top-full left-0 h-[0.58em] w-full -mt-[0.12em]',
+  circle: '-inset-x-[0.5em] -inset-y-[0.32em]',
+  highlight: '-inset-x-[0.18em] -inset-y-[0.06em]',
+  strike: 'top-1/2 left-0 h-[0.4em] w-full -translate-y-1/2',
+} as const;
+---
+
+<span class:list={['relative inline-block', className]}>
+  <svg
+    data-reveal
+    data-draw
+    viewBox={stroke.box}
+    preserveAspectRatio="none"
+    fill="none"
+    aria-hidden="true"
+    style={{ '--draw-delay': `${delay}ms`, '--reveal-y': '0', '--reveal-blur': '0px' }}
+    class:list={[
+      'pointer-events-none absolute',
+      GEOMETRY[variant],
+      TONE[tone],
+      isHighlight ? 'z-0 opacity-55' : 'z-10',
+    ]}
+  >
+    {
+      stroke.d.map((d) => (
+        <path
+          class="draw-path"
+          d={d}
+          pathLength="1"
+          stroke="currentColor"
+          stroke-linecap="round"
+          vector-effect="non-scaling-stroke"
+          style={{ strokeWidth: WIDTH[variant] }}
+        />
+      ))
+    }
+  </svg>
+
+  <span class="relative z-1"><slot /></span>
+</span>

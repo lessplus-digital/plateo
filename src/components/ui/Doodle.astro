@@ -1,0 +1,145 @@
+---
+/**
+ * Garabatos decorativos: flechas, destellos y rúbricas dibujadas a mano.
+ *
+ * Van sueltos por la página para guiar la mirada de un bloque al siguiente
+ * (una flecha que apunta al CTA, un destello sobre un dato). Todos son
+ * `aria-hidden`: no aportan información, solo tono. Si algo tiene que
+ * *significar* algo, escríbelo con palabras.
+ *
+ * Se dibujan al entrar en pantalla, igual que <Mark />.
+ */
+interface Props {
+  /**
+   * - `arrow-curve`  flecha larga con curva, de un bloque al de al lado.
+   * - `arrow-short`  flecha corta y ganchuda, para señalar algo pegado.
+   * - `sparkle`      tres destellos, para celebrar un dato.
+   * - `squiggle`     rúbrica ondulada, como firma de sección.
+   * - `corner`       esquina con radios, marca de "mira aquí".
+   */
+  shape: 'arrow-curve' | 'arrow-short' | 'sparkle' | 'squiggle' | 'corner';
+  tone?: 'mint' | 'violet' | 'navy' | 'current';
+  /** Ancho en px. El alto sale de la proporción del dibujo. */
+  width?: number;
+  /** Giro en grados. Los garabatos rectos se ven falsos. */
+  rotate?: number;
+  /** Espeja el dibujo en horizontal (una flecha que apunte al otro lado). */
+  flip?: boolean;
+  delay?: number;
+  class?: string;
+}
+
+const {
+  shape,
+  tone = 'mint',
+  width = 120,
+  rotate = 0,
+  flip = false,
+  delay = 220,
+  class: className,
+} = Astro.props;
+
+const TONE = {
+  mint: 'text-accent',
+  violet: 'text-accent-2',
+  navy: 'text-text',
+  current: '',
+} as const;
+
+/*
+  Los trazos con `fill` (las puntas de flecha y los destellos) no se pueden
+  dibujar con dasharray, así que entran con un fundido. Los que sí son línea
+  llevan la clase `draw-path` y se dibujan de principio a fin.
+*/
+const SHAPES = {
+  'arrow-curve': {
+    box: '0 0 160 90',
+    ratio: 90 / 160,
+    stroke: ['M6,12 C34,62 78,84 132,72'],
+    fill: ['M126,54 L146,70 L120,82 C126,74 128,64 126,54 Z'],
+    width: '2.6',
+  },
+  'arrow-short': {
+    box: '0 0 90 70',
+    ratio: 70 / 90,
+    stroke: ['M10,8 C14,34 30,52 60,56'],
+    fill: ['M50,42 L72,58 L46,66 C53,58 54,50 50,42 Z'],
+    width: '2.8',
+  },
+  sparkle: {
+    box: '0 0 100 100',
+    ratio: 1,
+    stroke: [],
+    // Cuatro puntas cóncavas: el destello clásico de rotulador.
+    fill: [
+      'M52,6 C56,30 66,42 92,48 C66,54 56,66 52,92 C48,66 38,54 12,48 C38,42 48,30 52,6 Z',
+      'M20,58 C22,70 26,76 38,79 C26,82 22,88 20,98 C18,88 14,82 2,79 C14,76 18,70 20,58 Z',
+      'M82,4 C84,14 87,19 96,21 C87,23 84,28 82,37 C80,28 77,23 68,21 C77,19 80,14 82,4 Z',
+    ],
+    width: '0',
+  },
+  squiggle: {
+    box: '0 0 200 24',
+    ratio: 24 / 200,
+    stroke: ['M4,14 C24,2 44,22 66,13 C86,5 104,20 126,13 C148,6 168,20 196,10'],
+    fill: [],
+    width: '3',
+  },
+  corner: {
+    box: '0 0 120 120',
+    ratio: 1,
+    stroke: ['M8,112 C10,58 22,26 62,12', 'M8,112 C34,110 58,104 82,92'],
+    fill: [],
+    width: '2.6',
+  },
+} as const;
+
+const shp = SHAPES[shape];
+const height = Math.round(width * shp.ratio);
+
+/*
+  El giro va en un <span> envolvente y no en el propio SVG. Si se pusiera en el
+  SVG como estilo en línea, ganaría al `transform` de la animación de entrada
+  (que vive en la hoja de estilos) y el garabato entraría sin moverse.
+  Separándolos, cada transform es de quien le corresponde.
+*/
+const transform = [rotate ? `rotate(${rotate}deg)` : '', flip ? 'scaleX(-1)' : '']
+  .filter(Boolean)
+  .join(' ');
+---
+
+<span
+  class:list={['pointer-events-none inline-block shrink-0', className]}
+  style={transform ? { transform } : undefined}
+  aria-hidden="true"
+>
+  <svg
+    data-reveal
+    data-draw
+    viewBox={shp.box}
+    width={width}
+    height={height}
+    fill="none"
+    class:list={['block', TONE[tone]]}
+    style={{
+      '--draw-delay': `${delay}ms`,
+      '--reveal-delay': `${delay}ms`,
+      '--reveal-y': '0.5rem',
+      '--reveal-blur': '4px',
+    }}
+  >
+    {
+      shp.stroke.map((d) => (
+        <path
+          class="draw-path"
+          d={d}
+          pathLength="1"
+          stroke="currentColor"
+          stroke-width={shp.width}
+          stroke-linecap="round"
+        />
+      ))
+    }
+    {shp.fill.map((d) => <path d={d} fill="currentColor" />)}
+  </svg>
+</span>

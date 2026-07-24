@@ -1,46 +1,165 @@
 @import 'tailwindcss';
 
 /*
-  Fuente self-hosted (no Google Fonts CDN: bloquea el render y es un hit de
+  Fuentes self-hosted (no Google Fonts CDN: bloquea el render y es un hit de
   privacidad/RGPD). `wght.css` trae solo el eje de peso, y el unicode-range
   hace que el navegador descargue únicamente el subset latino.
+
+  Dos familias, dos trabajos distintos:
+  - Bricolage Grotesque -> titulares. Es una grotesca variable con eje de ancho
+    y terminaciones deliberadamente irregulares: da carácter sin ser decorativa.
+  - Inter               -> todo el cuerpo y la UI. Neutra a propósito.
+
+  Hubo una tercera, Caveat, para las notas manuscritas al margen. Se quitó: el
+  subset latino pesa 73 KB (más que Inter entera) y lo usaban tres frases. Ni
+  recortándola al alfabeto español bajaba de 60 KB, porque los glifos de una
+  cursiva llevan muchísimos puntos. El aire de anotación a mano lo ponen ahora
+  las flechas dibujadas de <Doodle /> y el peso ligero de Bricolage, que ya
+  está descargada. Si algún día se echa de menos, volver a añadirla es un
+  import y cambiar la utilidad `handwritten`.
 */
+@import '@fontsource-variable/bricolage-grotesque/opsz.css';
 @import '@fontsource-variable/inter/wght.css';
 
 /* ==========================================================================
-   Design tokens — Plateo
-   Todo lo de aquí queda disponible como utilidad de Tailwind:
-   --color-brand-500  ->  bg-brand-500 / text-brand-500 / border-brand-500
-   --font-sans        ->  font-sans
-   --animate-marquee  ->  animate-marquee
+   1. Paleta de marca
+   Los tres colores oficiales, extraídos del logo y de Paleta.png:
+     menta   #15F5BA  (el propio relleno del isotipo)
+     navy    #211951
+     violeta #836FFF
+   Cada rampa mantiene el tono fijo y solo mueve L y C, así los pasos
+   intermedios no derivan hacia otro color.
    ========================================================================== */
 @theme {
-  /* --- Superficies (diseño dark-first) --- */
-  --color-ink-950: oklch(0.16 0.012 264);
-  --color-ink-900: oklch(0.21 0.014 264);
-  --color-ink-800: oklch(0.27 0.016 264);
-  --color-ink-700: oklch(0.37 0.016 264);
-  --color-ink-500: oklch(0.58 0.014 264);
-  --color-ink-300: oklch(0.78 0.01 264);
-  --color-ink-100: oklch(0.94 0.005 264);
+  /* --- Menta. El color del logo. Sobre blanco NO sirve para texto
+         (contraste ~1.5:1): es color de RELLENO, con navy encima. --- */
+  --color-mint-50: oklch(0.972 0.032 167.3);
+  --color-mint-100: oklch(0.945 0.062 167.3);
+  --color-mint-200: oklch(0.905 0.105 167.3);
+  --color-mint-300: oklch(0.884 0.14 167.3);
+  --color-mint-400: oklch(0.862 0.174 167.3); /* ← menta oficial #15F5BA */
+  --color-mint-500: oklch(0.795 0.163 167.3);
+  --color-mint-600: oklch(0.7 0.144 167.8);
+  --color-mint-700: oklch(0.58 0.118 168.5);
+  --color-mint-800: oklch(0.47 0.094 169);
+  --color-mint-900: oklch(0.37 0.072 169.5);
 
-  /* --- Marca. PLACEHOLDER: sustituir cuando exista la identidad oficial. --- */
-  --color-brand-50: oklch(0.97 0.02 65);
-  --color-brand-200: oklch(0.89 0.07 65);
-  --color-brand-400: oklch(0.78 0.15 55);
-  --color-brand-500: oklch(0.71 0.18 48);
-  --color-brand-600: oklch(0.63 0.18 44);
-  --color-brand-700: oklch(0.53 0.15 42);
+  /* --- Navy. Hace de escala de grises: todos los neutros están teñidos
+         de azul para que el gris nunca se vea sucio junto a la menta. --- */
+  --color-navy-25: oklch(0.985 0.004 283.8);
+  --color-navy-50: oklch(0.968 0.008 283.8);
+  --color-navy-100: oklch(0.938 0.014 283.8);
+  --color-navy-200: oklch(0.89 0.022 283.8);
+  --color-navy-300: oklch(0.8 0.032 283.8);
+  --color-navy-400: oklch(0.68 0.045 283.8);
+  --color-navy-500: oklch(0.565 0.058 283.8);
+  --color-navy-600: oklch(0.47 0.072 283.8); /* mínimo legible sobre blanco (5:1) */
+  --color-navy-700: oklch(0.385 0.085 283.8);
+  --color-navy-800: oklch(0.32 0.093 283.8);
+  --color-navy-900: oklch(0.262 0.098 283.8); /* ← navy oficial #211951 */
+  --color-navy-950: oklch(0.205 0.082 283.8);
 
-  /* --- Tipografía: una sola familia variable, self-hosted --- */
+  /* --- Violeta. Acento secundario y color de enlace. --- */
+  --color-violet-50: oklch(0.965 0.022 285.3);
+  --color-violet-100: oklch(0.93 0.045 285.3);
+  --color-violet-200: oklch(0.87 0.085 285.3);
+  --color-violet-300: oklch(0.79 0.135 285.3);
+  --color-violet-400: oklch(0.71 0.175 285.3);
+  --color-violet-500: oklch(0.634 0.206 285.3); /* ← violeta oficial #836FFF */
+  --color-violet-600: oklch(0.56 0.22 285.3);
+  --color-violet-700: oklch(0.48 0.2 285.3); /* texto violeta sobre blanco (6.4:1) */
+  --color-violet-800: oklch(0.4 0.165 285.3);
+  --color-violet-900: oklch(0.33 0.13 285.3);
+
+  /* --- Estado. NO es color de marca: existe porque un pedido pasa por tres
+         etapas y hacen falta tres tonos distinguibles entre sí, y la paleta
+         oficial solo trae dos. Úsalo solo para estados, nunca para decorar. --- */
+  --color-status-warm: oklch(0.82 0.16 78);
+}
+
+/* ==========================================================================
+   2. Tokens semánticos
+   La página nunca nombra "navy-900": nombra "text". Esa indirección es lo
+   que permite añadir modo oscuro más adelante cambiando SOLO este bloque.
+
+   `@theme inline` es la pieza clave: emite las utilidades como
+   `var(--surface)` en vez de resolver el valor en build. Por eso basta
+   redefinir --surface en un media query o en [data-theme] para que
+   `bg-surface` cambie en toda la página sin recompilar.
+   ========================================================================== */
+:root {
+  --surface: #fff;
+  --surface-sunken: var(--color-navy-25);
+  --surface-raised: #fff;
+  /* Bloques oscuros de contraste (el CTA, el footer, el demo en vivo) */
+  --surface-inverse: var(--color-navy-900);
+
+  --text: var(--color-navy-900);
+  --text-muted: var(--color-navy-600);
+  --text-faint: var(--color-navy-500);
+  --text-inverse: #fff;
+  --text-inverse-muted: var(--color-navy-200);
+
+  --line: var(--color-navy-100);
+  --line-strong: var(--color-navy-200);
+  --line-inverse: oklch(1 0 0 / 0.14);
+
+  /* Acentos. `accent` es relleno (lleva texto navy encima);
+     `accent-ink` es el mismo color pero ya oscurecido para poder ser texto. */
+  --accent: var(--color-mint-400);
+  --accent-soft: var(--color-mint-100);
+  --accent-ink: var(--color-mint-800);
+  --accent-2: var(--color-violet-500);
+  --accent-2-soft: var(--color-violet-100);
+  --accent-2-ink: var(--color-violet-700);
+}
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-inverse: var(--surface-inverse);
+
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+  --color-text-inverse: var(--text-inverse);
+  --color-text-inverse-muted: var(--text-inverse-muted);
+
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-line-inverse: var(--line-inverse);
+
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-2: var(--accent-2);
+  --color-accent-2-soft: var(--accent-2-soft);
+  --color-accent-2-ink: var(--accent-2-ink);
+}
+
+/* ==========================================================================
+   3. Tipografía, curvas y animaciones
+   ========================================================================== */
+@theme {
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', 'Inter Variable', ui-sans-serif, sans-serif;
+  --font-hand: 'Bricolage Grotesque Variable', ui-sans-serif, sans-serif;
+  /* Para tiquetes y números de pedido. Pila del sistema: 0 KB, y el aire de
+     impresora térmica lo pone la propia monoespaciada del equipo. */
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, monospace;
 
-  /* --- Curvas de animación --- */
+  /* Equivalentes CSS de las curvas de GSAP que usa la referencia:
+     power2.out = easeOutCubic · power3.out = easeOutQuart */
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Rebote corto para stickers y estados activos */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* --- Animaciones reutilizables --- */
-  --animate-marquee: marquee 45s linear infinite;
-  --animate-float: float 6s ease-in-out infinite;
+  --animate-marquee: marquee 42s linear infinite;
+  --animate-blink: blink 1.1s steps(2, start) infinite;
+  --animate-typing: typing 1.4s ease-in-out infinite;
 
   @keyframes marquee {
     from {
@@ -51,35 +170,55 @@
     }
   }
 
-  @keyframes float {
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* Los tres puntos de "escribiendo…" del chat */
+  @keyframes typing {
     0%,
+    60%,
     100% {
       transform: translateY(0);
+      opacity: 0.35;
     }
-    50% {
-      transform: translateY(-0.75rem);
+    30% {
+      transform: translateY(-0.25rem);
+      opacity: 1;
     }
   }
 }
 
 /* ==========================================================================
-   Base
+   4. Base
    ========================================================================== */
 @layer base {
   html {
     scroll-behavior: smooth;
     /* Compensa el header sticky al saltar a un #ancla */
     scroll-padding-top: 6rem;
-    color-scheme: dark;
+    color-scheme: light;
     -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    background-color: var(--color-ink-950);
-    color: var(--color-ink-100);
+    background-color: var(--surface);
+    color: var(--text);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  /*
+    Bricolage tiene optical sizing: a tamaño titular afina las astas y
+    aprieta el espaciado. Sin esto los títulos grandes se ven pesados.
+  */
+  :where(h1, h2, h3, .font-display) {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
   }
 
   /* Los números tabulares no bailan al animarse (precios, contadores) */
@@ -88,45 +227,80 @@
   }
 
   :where(:focus-visible) {
-    outline: 2px solid var(--color-brand-500);
+    outline: 2px solid var(--accent-2);
     outline-offset: 3px;
     border-radius: 4px;
   }
 
   ::selection {
-    background: var(--color-brand-500);
-    color: var(--color-ink-950);
+    background: var(--accent);
+    color: var(--color-navy-900);
   }
 }
 
 /* ==========================================================================
-   Scroll reveal
+   5. Scroll reveal
    El JS solo añade `.is-revealed`; toda la animación vive en CSS.
-   Si el usuario pide menos movimiento, el contenido se muestra sin animar.
+
+   El desenfoque de salida es lo que hace que la entrada se sienta "fluida"
+   y no un simple deslizamiento: el elemento se enfoca mientras sube.
+   Coste: 0 KB de librería (la referencia hace lo mismo con GSAP, ~70 KB).
    ========================================================================== */
 @media (prefers-reduced-motion: no-preference) {
   [data-reveal] {
     opacity: 0;
-    transform: translate3d(var(--reveal-x, 0), var(--reveal-y, 1.75rem), 0)
-      scale(var(--reveal-scale, 1));
+    filter: blur(var(--reveal-blur, 12px));
+    transform: translate3d(var(--reveal-x, 0), var(--reveal-y, 2rem), 0)
+      scale(var(--reveal-scale, 1)) rotate(var(--reveal-rotate, 0deg));
     transition:
-      opacity 0.8s var(--ease-out-expo),
-      transform 0.8s var(--ease-out-expo);
+      opacity 0.65s var(--ease-out-cubic),
+      filter 0.65s var(--ease-out-cubic),
+      transform 0.75s var(--ease-out-cubic);
     transition-delay: var(--reveal-delay, 0ms);
-    will-change: opacity, transform;
+    will-change: opacity, transform, filter;
   }
 
   [data-reveal].is-revealed {
     opacity: 1;
+    filter: blur(0);
     transform: none;
     will-change: auto;
   }
+
+  /*
+    Los trazos de marcador se dibujan solos: el trazo empieza "sin tinta"
+    (dashoffset completo) y se va rellenando. Ver Mark.astro y Doodle.astro.
+
+    Los paths llevan `pathLength="1"`, que normaliza la longitud del trazo a 1
+    sin importar su geometría real. Por eso aquí basta con 1 y no hay que medir
+    cada curva ni pasar una longitud distinta por variante.
+  */
+  [data-draw] .draw-path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0.7s var(--ease-out-cubic);
+    transition-delay: var(--draw-delay, 260ms);
+  }
+
+  /* Un segundo trazo (el doble subrayado) entra siempre después del primero */
+  [data-draw] .draw-path + .draw-path {
+    transition-delay: calc(var(--draw-delay, 260ms) + 180ms);
+  }
+
+  [data-draw].is-revealed .draw-path {
+    stroke-dashoffset: 0;
+  }
 }
 
-/* Sin JS (o si falla), nada queda invisible. */
+/* Sin JS (o si falla), nada queda invisible ni a medio dibujar. */
 html.no-js [data-reveal] {
   opacity: 1;
+  filter: none;
   transform: none;
+}
+
+html.no-js [data-draw] .draw-path {
+  stroke-dashoffset: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -144,12 +318,12 @@ html.no-js [data-reveal] {
 }
 
 /* ==========================================================================
-   Utilidades propias
+   6. Utilidades propias
    ========================================================================== */
 @utility container-page {
   width: 100%;
   margin-inline: auto;
-  max-width: 80rem;
+  max-width: 78rem;
   padding-inline: 1.25rem;
 
   @media (width >= 48rem) {
@@ -157,15 +331,21 @@ html.no-js [data-reveal] {
   }
 }
 
-/* Degradado de texto para titulares */
-@utility text-gradient {
-  background-image: linear-gradient(
-    100deg,
-    var(--color-ink-100) 25%,
-    var(--color-brand-400) 75%
-  );
-  background-clip: text;
-  color: transparent;
+/*
+  Nota al margen. Solo para frases muy cortas, y casi siempre junto a una
+  flecha de <Doodle />: es la flecha la que dice "esto va aparte", no la
+  tipografía. Peso ligero y un grado de inclinación para separarla del texto
+  de UI sin cambiar de familia.
+*/
+@utility handwritten {
+  font-family: var(--font-hand);
+  font-weight: 300;
+  font-size: 1.05em;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  display: inline-block;
+  transform: rotate(-1.2deg);
+  transform-origin: left center;
 }
 
 /* Difumina los bordes de un carrusel para insinuar que hay más contenido */
@@ -173,8 +353,48 @@ html.no-js [data-reveal] {
   mask-image: linear-gradient(
     to right,
     transparent,
-    black 4rem,
-    black calc(100% - 4rem),
+    black 3rem,
+    black calc(100% - 3rem),
     transparent
   );
+}
+
+/*
+  Borde dentado de tiquete de caja: la fila de semicírculos que deja una
+  impresora térmica al cortar el papel.
+
+  Hacen falta DOS capas de máscara, no una. La primera es el cuerpo del
+  tiquete; la segunda, la tira de dientes del borde inferior. Con una sola
+  capa, todo lo que no cubriera esa capa quedaría enmascarado — es decir,
+  la tarjeta entera desaparecería salvo la tira.
+
+  Las capas se combinan en unión, que es el valor inicial de `mask-composite`.
+*/
+@utility ticket-edge {
+  --ticket-tooth: 0.75rem;
+
+  mask-image:
+    /* cuerpo: todo menos la franja de abajo */ linear-gradient(black, black),
+    /* dientes: media circunferencia colgando de cada baldosa */
+    radial-gradient(
+      circle at 50% 0,
+      black calc(var(--ticket-tooth) / 2),
+      transparent calc(var(--ticket-tooth) / 2)
+    );
+  mask-size:
+    100% calc(100% - var(--ticket-tooth)),
+    var(--ticket-tooth) var(--ticket-tooth);
+  mask-repeat: no-repeat, repeat-x;
+  mask-position:
+    top left,
+    bottom left;
+  padding-bottom: var(--ticket-tooth);
+}
+
+/* Retícula de fondo tenue, para las secciones oscuras */
+@utility grid-bg {
+  background-image:
+    linear-gradient(to right, var(--line-inverse) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line-inverse) 1px, transparent 1px);
+  background-size: 3.5rem 3.5rem;
 }

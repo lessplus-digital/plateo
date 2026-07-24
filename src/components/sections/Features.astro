@@ -1,51 +1,97 @@
 ---
 import Reveal from '../ui/Reveal.astro';
+import Doodle from '../ui/Doodle.astro';
 
-// Copy provisional: ajustar con el mensaje comercial definitivo.
-const FEATURES = [
+/**
+ * "La carta": las funciones presentadas como el menú de un restaurante.
+ *
+ * Va sobre menta a sangre completa. Es el bloque de color más fuerte de la
+ * página y por eso solo hay uno: rompe el blanco justo antes de la demo en
+ * navy y le da al scroll un ritmo de tres tiempos (claro, menta, oscuro).
+ *
+ * Menta con texto navy da 13:1 de contraste. Al revés — texto menta sobre
+ * blanco — daría 1.5:1 y sería ilegible. No lo inviertas.
+ */
+const PLATOS = [
   {
-    title: 'El bot toma el pedido',
-    body: 'Atiende en WhatsApp a cualquier hora, consulta el menú real y nunca inventa un precio.',
+    n: '01',
+    title: 'Toma el pedido sin que nadie conteste',
+    body: 'Responde en WhatsApp a cualquier hora con tu menú real y tus precios reales. Si algo se acabó, deja de ofrecerlo.',
   },
   {
-    title: 'Tablero en tiempo real',
-    body: 'Cada pedido aparece en cocina al instante, con sonido y estado: recibido, en preparación, en camino.',
+    n: '02',
+    title: 'Lo manda a cocina en segundos',
+    body: 'La comanda aparece en el tablero con sonido. Recibido, en preparación, en camino: todo el turno ve lo mismo.',
   },
   {
-    title: 'Clientes que vuelven',
-    body: 'Historial, frecuencia y gasto de cada cliente. Sabes a quién escribirle y cuándo.',
+    n: '03',
+    title: 'Se acuerda de tus clientes',
+    body: 'Dirección, historial y cuánto ha gastado cada uno. La próxima vez no hay que preguntar nada dos veces.',
   },
   {
-    title: 'Reservas sin agenda de papel',
-    body: 'Mesas confirmadas por WhatsApp y visibles para todo el equipo.',
+    n: '04',
+    title: 'Cuadra las mesas',
+    body: 'Reservas confirmadas por chat y visibles para el equipo. Se acabó la agenda de papel junto al teléfono.',
   },
   {
-    title: 'Números que sirven',
-    body: 'Ventas del día, productos más pedidos y horas pico. Sin exportar nada a Excel.',
+    n: '05',
+    title: 'Te dice qué se está vendiendo',
+    body: 'Ventas del día, ticket promedio, horas pico y los platos que más salen. Sin exportar nada a Excel.',
   },
   {
-    title: 'Tu base de datos es tuya',
-    body: 'Una instancia dedicada por restaurante. Sin marketplace de por medio y sin comisión por venta.',
+    n: '06',
+    title: 'Los datos son del restaurante',
+    body: 'Una instancia dedicada por local. Sin marketplace de por medio, sin comisión por venta y sin alquilar tus clientes.',
   },
 ];
 ---
 
-<section id="producto" class="container-page scroll-mt-24 py-24 md:py-32">
-  <Reveal>
-    <h2 class="max-w-2xl text-4xl font-semibold tracking-tight text-balance md:text-5xl">
-      Todo lo que pasa entre el "hola" y el domicilio entregado
-    </h2>
-  </Reveal>
-
-  <ul class="mt-14 grid gap-px overflow-hidden rounded-2xl border border-ink-800 bg-ink-800 sm:grid-cols-2 lg:grid-cols-3">
-    {
-      FEATURES.map(({ title, body }, i) => (
-        // El delay escalonado hace que la grilla entre en cascada, no en bloque.
-        <Reveal as="li" delay={i * 70} class="bg-ink-950 p-7 transition-colors hover:bg-ink-900/60">
-          <h3 class="text-base font-medium">{title}</h3>
-          <p class="mt-2 text-sm leading-relaxed text-ink-300">{body}</p>
+<section id="producto" class="scroll-mt-24 bg-accent py-24 text-navy-900 md:py-32">
+  <div class="container-page">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div class="max-w-2xl">
+        <Reveal variant="fade">
+          <p class="text-xs font-semibold tracking-[0.18em] uppercase opacity-70">La carta</p>
         </Reveal>
-      ))
-    }
-  </ul>
+
+        <Reveal as="h2" delay={70} class="mt-4 text-4xl font-semibold text-balance md:text-5xl">
+          Todo lo que pasa entre el «hola» y el domicilio entregado
+        </Reveal>
+      </div>
+
+      <Reveal delay={140} class="hidden lg:block">
+        <Doodle shape="squiggle" tone="navy" width={140} rotate={-3} delay={420} />
+      </Reveal>
+    </div>
+
+    <!--
+      Separadores punteados entre platos, como en una carta impresa. El borde
+      superior del primero lo pone el <ul>, así no hay que tratar aparte el
+      primer elemento en cada columna.
+    -->
+    <ul class="mt-14 grid gap-x-14 md:grid-cols-2">
+      {
+        PLATOS.map((plato, i) => (
+          <Reveal
+            as="li"
+            delay={i * 60}
+            blur={6}
+            class="border-t border-dashed border-navy-900/25 py-7"
+          >
+            <div class="flex gap-5">
+              <span class="mt-1 font-mono text-sm font-bold tabular-nums opacity-45">
+                {plato.n}
+              </span>
+              <div>
+                <h3 class="text-lg font-semibold text-balance">{plato.title}</h3>
+                <p class="mt-2 text-[0.95rem] leading-relaxed text-navy-800/85 text-pretty">
+                  {plato.body}
+                </p>
+              </div>
+            </div>
+          </Reveal>
+        ))
+      }
+    </ul>
+  </div>
 </section>

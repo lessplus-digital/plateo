@@ -42,7 +42,7 @@ así que es la verificación real antes de commitear.
 | **Tailwind CSS v4** | Config vía `@theme` en CSS, sin `tailwind.config.js`. |
 | **TypeScript strict** | Props de componentes siempre tipadas con `interface Props`. |
 | **Vercel** | Salida estática; push a `main` despliega. |
-| **Fontsource** | Inter Variable self-hosted. Nunca Google Fonts por CDN. |
+| **Fontsource** | Bricolage Grotesque, Inter y Caveat, todas variables y self-hosted. Nunca Google Fonts por CDN. |
 
 **Sin framework de UI (React/Vue/Svelte).** Astro solo, con `<script>` vanilla para lo
 poco interactivo. Si algo llegara a necesitar estado real, se añade una isla
@@ -57,8 +57,9 @@ src/
   components/
     BaseHead.astro          # ÚNICO sitio con meta/OG/canonical/JSON-LD
     layout/                 # Header, Footer
-    sections/               # bloques de página (Hero, Features, Showcase, CTA)
-    ui/                     # primitivas reutilizables (Button, Reveal, Carousel, VideoLoop)
+    sections/               # bloques de página, en el orden en que van en index
+    ui/                     # primitivas: Button, Logo, Mark, Doodle, Sticker,
+                            # Ticket, Reveal, Carousel, VideoLoop
   scripts/reveal.ts         # IntersectionObserver global del scroll reveal
   styles/global.css         # tokens @theme + base + utilidades
   pages/                    # una ruta por archivo
@@ -99,11 +100,69 @@ public/                     # se sirve tal cual: robots.txt, og.jpg, /videos, /f
 
 ### Estilos
 
-- Diseño **dark-first**. No hay theme toggle y no se necesita.
-- Los colores salen de los tokens `@theme` (`ink-*`, `brand-*`). Nunca uses la paleta
-  por defecto de Tailwind (`gray-500`, `orange-400`, …) ni hex sueltos.
+- Diseño **light-first**. Todavía no hay theme toggle, pero los tokens ya están
+  preparados: ver «Sistema de color» abajo.
+- Los colores salen de los tokens. Nunca uses la paleta por defecto de Tailwind
+  (`gray-500`, `orange-400`, …) ni hex sueltos.
 - Un solo botón `primary` visible por pantalla.
 - Ancho de página: la utilidad `container-page`, no `max-w-7xl mx-auto px-4` a mano.
+
+### Sistema de color
+
+Dos niveles, y la distinción importa:
+
+1. **Paleta** (`--color-mint-*`, `--color-navy-*`, `--color-violet-*`): los tres
+   colores oficiales de marca, sacados del logo y de `images/Paleta.png` —
+   menta `#15F5BA`, navy `#211951`, violeta `#836FFF`.
+2. **Semánticos** (`surface`, `text`, `line`, `accent`…): lo que usan las
+   páginas. Están declarados en `:root` y expuestos con `@theme inline`, que
+   emite las utilidades como `var(--surface)` en vez de resolver el valor en
+   build.
+
+Escribe siempre `bg-surface` / `text-text-muted`, no `bg-white` / `text-navy-600`.
+Gracias a esa indirección, **añadir modo oscuro es redefinir el bloque `:root` de
+`global.css` y nada más** — ni tocar componentes ni recompilar clases.
+
+Dos trampas de contraste, ya comprobadas:
+
+- La menta sobre blanco da 1.5:1. **Es color de relleno, con texto navy encima**,
+  nunca color de texto. Si necesitas menta legible sobre claro, usa `accent-ink`.
+- `navy-500` sobre blanco se queda en 3.6:1. Para texto secundario, `navy-600`
+  (5:1), que es lo que ya apunta `--text-muted`.
+
+### Tipografía
+
+Dos familias descargadas, y ninguna más. Entre las dos son ~122 KB (subset
+latino), que es todo el peso de la página: no hay imágenes.
+
+| Familia | Token | Para qué |
+|---|---|---|
+| Bricolage Grotesque | `font-display` | Titulares. Se aplica sola a `h1`/`h2`/`h3`. |
+| Inter | `font-sans` | Cuerpo y UI. |
+| — (pila del sistema) | `font-mono` | Tiquetes y números de pedido. 0 KB. |
+| — (Bricolage ligera) | `handwritten` | Notas al margen de 2-5 palabras. |
+
+Hubo una cursiva (Caveat) para las notas al margen y **se quitó a propósito**:
+73 KB para tres frases, y recortada al alfabeto español seguía en 60 KB. Si
+alguien la propone otra vez, ese es el precio.
+
+### Lenguaje gráfico
+
+Lo que aleja la web de una plantilla genérica, y conviene no diluir:
+
+- `<Mark />` — trazos de marcador sobre palabras clave. **Uno por titular**, y
+  frases cortas (lee el aviso del componente sobre el ajuste de línea).
+- `<Doodle />` — flechas y destellos dibujados que guían la lectura.
+- `<Sticker />` — etiqueta girada, con sombra dura. Una por pantalla.
+- `<Ticket />` — la comanda de papel. Es el objeto que Plateo reemplaza, y por
+  eso aparece en el hero y en el testimonio.
+
+Todo son SVG propios que se dibujan solos al entrar en pantalla (`data-draw` +
+`pathLength="1"`). Nada de librerías de iconos ni de imágenes.
+
+Lo que **no** se usa, por ser el gesto por defecto de cualquier landing
+generada: degradados en el texto, glassmorphism, halos radiales difuminados de
+fondo y rejillas de tarjetas con iconito.
 
 ### Contenido
 
@@ -115,8 +174,10 @@ public/                     # se sirve tal cual: robots.txt, og.jpg, /videos, /f
 ## Pendientes conocidos
 
 - `SITE.url`, `LINKS.login`, `LINKS.whatsapp` y `LINKS.email` son **placeholders**.
-- La paleta `brand-*` es **provisional**, a la espera de la identidad visual oficial.
-- Faltan los videos reales del producto (Hero y Showcase usan marcadores).
+- Faltan los videos reales del producto (Showcase usa marcadores).
+- El testimonio de `Testimonial.astro` (cita, cifras y foto) es **provisional**:
+  hay que sustituirlo por el real y con permiso del cliente.
+- Modo oscuro: los tokens ya están listos, falta el toggle. Ver «Sistema de color».
 - Falta `public/og.jpg` (1200×630) — sin él las previews en WhatsApp salen vacías.
 - Sin analítica. Cuando toque: Plausible o Umami (~1 KB), no GA4.
 

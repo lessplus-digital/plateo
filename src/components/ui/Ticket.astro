@@ -1,0 +1,48 @@
+---
+/**
+ * Comanda impresa: la tarjeta con forma de tiquete de caja registradora.
+ *
+ * Es el objeto físico que todo el mundo en un restaurante reconoce, y el que
+ * Plateo sustituye. Por eso aparece en el hero y en el testimonio: cuenta de
+ * qué va el producto antes de que nadie lea una sola línea de copy.
+ *
+ * El borde inferior dentado sale de la utilidad `ticket-edge` (una máscara con
+ * semicírculos repetidos), no de una imagen.
+ */
+interface Props {
+  /** Número de comanda. Va en monoespaciada, como sale de la impresora. */
+  code?: string;
+  /** Cabecera pequeña sobre el número. */
+  label?: string;
+  /** Giro en grados: un tiquete perfectamente recto no existe. */
+  rotate?: number;
+  class?: string;
+}
+
+const { code, label, rotate = 0, class: className } = Astro.props;
+---
+
+<div
+  class:list={[
+    'ticket-edge bg-surface font-mono text-navy-900 shadow-xl shadow-navy-900/10',
+    className,
+  ]}
+  style={rotate ? { transform: `rotate(${rotate}deg)` } : undefined}
+>
+  <div class="px-5 pt-5">
+    {
+      (label || code) && (
+        <div class="flex items-baseline justify-between gap-3 border-b border-dashed border-line-strong pb-3">
+          {label && (
+            <span class="text-[0.65rem] tracking-[0.16em] text-text-faint uppercase">{label}</span>
+          )}
+          {code && <span class="tnum text-sm font-bold">{code}</span>}
+        </div>
+      )
+    }
+
+    <div class="py-3">
+      <slot />
+    </div>
+  </div>
+</div>

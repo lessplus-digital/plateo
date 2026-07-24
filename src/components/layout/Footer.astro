@@ -1,34 +1,93 @@
 ---
 import { NAV, SITE, LINKS } from '../../consts';
+import Logo from '../ui/Logo.astro';
 
 const year = new Date().getFullYear();
 ---
 
-<footer class="mt-32 border-t border-ink-800/80">
-  <div class="container-page flex flex-col gap-8 py-12 sm:flex-row sm:items-center sm:justify-between">
-    <div>
-      <p class="text-lg font-semibold tracking-tight">{SITE.name}</p>
-      <p class="mt-1 max-w-xs text-sm text-ink-500">{SITE.description}</p>
+<!--
+  Comparte el navy con el CTA que va justo encima: el final de la página es un
+  solo bloque oscuro, no dos franjas pegadas. De ahí que no lleve margen
+  superior y sí un filete de separación.
+-->
+<footer class="bg-surface-inverse text-text-inverse">
+  <div class="container-page">
+    <div
+      class="flex flex-col gap-10 border-t border-line-inverse py-14 sm:flex-row sm:justify-between"
+    >
+      <div class="max-w-xs">
+        <Logo variant="lockup" height={24} class="text-accent" />
+        <p class="mt-4 text-sm leading-relaxed text-text-inverse-muted">
+          {SITE.description}
+        </p>
+      </div>
+
+      <div class="flex gap-14 sm:gap-20">
+        <nav aria-labelledby="footer-producto">
+          <p id="footer-producto" class="text-xs tracking-[0.14em] text-navy-400 uppercase">
+            Producto
+          </p>
+          <ul class="mt-4 space-y-2.5">
+            {
+              NAV.map(({ label, href }) => (
+                <li>
+                  <a
+                    href={href}
+                    class="text-sm text-text-inverse-muted transition-colors hover:text-accent"
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <nav aria-labelledby="footer-contacto">
+          <p id="footer-contacto" class="text-xs tracking-[0.14em] text-navy-400 uppercase">
+            Contacto
+          </p>
+          <ul class="mt-4 space-y-2.5">
+            <li>
+              <a
+                href={LINKS.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-sm text-text-inverse-muted transition-colors hover:text-accent"
+              >
+                WhatsApp
+              </a>
+            </li>
+            <li>
+              <a
+                href={`mailto:${LINKS.email}`}
+                class="text-sm text-text-inverse-muted transition-colors hover:text-accent"
+              >
+                {LINKS.email}
+              </a>
+            </li>
+            <li>
+              <a
+                href={LINKS.login}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-sm text-text-inverse-muted transition-colors hover:text-accent"
+              >
+                Entrar al panel
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
 
-    <nav class="flex flex-wrap gap-x-6 gap-y-2" aria-label="Pie de página">
-      {
-        NAV.map(({ label, href }) => (
-          <a href={href} class="text-sm text-ink-300 transition-colors hover:text-ink-100">
-            {label}
-          </a>
-        ))
-      }
-      <a
-        href={`mailto:${LINKS.email}`}
-        class="text-sm text-ink-300 transition-colors hover:text-ink-100"
-      >
-        Contacto
-      </a>
-    </nav>
-  </div>
-
-  <div class="container-page border-t border-ink-800/60 py-6">
-    <p class="text-xs text-ink-500">© {year} {SITE.name}. Todos los derechos reservados.</p>
+    <div
+      class="flex flex-col gap-2 border-t border-line-inverse py-6 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p class="text-xs text-navy-400">
+        © {year} {SITE.name}. Hecho en Bogotá.
+      </p>
+      <p class="text-xs text-navy-400">Precios en pesos colombianos (COP).</p>
+    </div>
   </div>
 </footer>

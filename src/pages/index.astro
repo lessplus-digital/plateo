@@ -2,14 +2,25 @@
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/sections/Hero.astro';
 import Features from '../components/sections/Features.astro';
+import LiveDemo from '../components/sections/LiveDemo.astro';
+import Steps from '../components/sections/Steps.astro';
 import Showcase from '../components/sections/Showcase.astro';
+import Testimonial from '../components/sections/Testimonial.astro';
 import CTA from '../components/sections/CTA.astro';
 ---
 
-<!-- Sin `title`: la home usa SITE.defaultTitle completo. -->
+{/* Sin `title`: la home usa SITE.defaultTitle completo. */}
 <Layout>
+  {/*
+    El orden dibuja un arco de color — claro, menta, oscuro, claro, oscuro —
+    para que el scroll tenga ritmo y ningún bloque se parezca al anterior.
+    Si añades una sección, mira dónde cae dentro de ese arco.
+  */}
   <Hero />
   <Features />
+  <LiveDemo />
+  <Steps />
   <Showcase />
+  <Testimonial />
   <CTA />
 </Layout>
