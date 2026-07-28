@@ -1,6 +1,6 @@
 ---
 /**
- * Iconografía propia. Seis glifos, uno por capacidad del producto.
+ * Iconografía propia. Un glifo por capacidad del producto.
  *
  * Están dibujados a mano sobre una retícula de 24x24 y a propósito NO son
  * geométricamente perfectos: los trazos cierran un pelo desalineados y las
@@ -11,7 +11,15 @@
  * Todo es `stroke` con `currentColor`, así que el color lo pone el contenedor.
  */
 interface Props {
-  name: 'agente' | 'pedido' | 'reservas' | 'atencion' | 'estadisticas' | 'resenas' | 'soporte';
+  name:
+    | 'agente'
+    | 'pedido'
+    | 'reservas'
+    | 'atencion'
+    | 'clientes'
+    | 'estadisticas'
+    | 'resenas'
+    | 'soporte';
   /** Lado en px. Se dibujan pensados para 24-32. */
   size?: number;
   class?: string;
@@ -45,6 +53,16 @@ const ICONS: Record<Props['name'], string[]> = {
     'M4 5.4h16v10.9h-7.2l-4.2 3.9v-3.9H4V5.4Z',
     'M10 8.9a2 2 0 0 1 3.9.7c0 1.4-1.9 1.6-1.9 2.8',
     'M12 14.3v.1',
+  ],
+  // Corazón de un trazo: el cliente que vuelve.
+  //
+  // Se probó antes con una persona y un corazoncito al hombro, y con dos
+  // bustos superpuestos: a 24px las dos versiones se confundían con `soporte`,
+  // que ya es una persona. El corazón suelto no se parece a ningún otro glifo
+  // de la lista, y con el título "Clientes" al lado no se lee como "me gusta".
+  // Los dos lóbulos no son iguales a propósito.
+  clientes: [
+    'M12.1 19.9C10.4 18.5 4 14.6 4 10.1c0-2.3 1.7-4 3.8-4 1.8 0 3.3 1.1 4.2 2.7.8-1.7 2.3-2.8 4.1-2.8 2.2 0 3.9 1.8 3.9 4.1 0 4.5-6.3 8.4-7.9 9.8Z',
   ],
   // Barras más línea de tendencia.
   estadisticas: [

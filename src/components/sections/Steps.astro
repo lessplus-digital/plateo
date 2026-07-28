@@ -2,7 +2,6 @@
 import Reveal from '../ui/Reveal.astro';
 import Doodle from '../ui/Doodle.astro';
 import Mark from '../ui/Mark.astro';
-import Sticker from '../ui/Sticker.astro';
 
 /**
  * Puesta en marcha, en tres pasos.
@@ -117,59 +116,11 @@ const PASOS = [
     </ol>
 
     {/*
-      Cierre de la sección: la garantía.
-
-      El tratamiento de papel —borde de 2 px y sombra sin difuminar— la
-      emparenta con <Sticker />: un objeto pegado encima de la página, no otro
-      párrafo más. Eso se conserva.
-
-      Lo que NO se conserva de la primera versión es la composición: pegatina
-      centrada, titular centrado, párrafo centrado, filete y letra chica
-      centrada. Esa pila de cuatro pisos decrecientes es el patrón por defecto
-      de cualquier bloque de garantía generado, y además estiraba la tarjeta a
-      ~340 px de alto para decir una sola cosa.
-
-      Ahora son dos columnas: la promesa a la izquierda, la condición a la
-      derecha en cuerpo pequeño. La tarjeta baja a ~150 px y el copy de 61
-      palabras a 26 — el párrafo del medio se fue entero porque repetía el
-      titular con más palabras. La pegatina va pegada a la esquina y no
-      centrada, que es como se pega una pegatina de verdad.
-
-      El titular no es un <h3> a propósito. Los tres <h3> de la sección son los
-      pasos, y meter un cuarto hermano que no es un paso ensucia el esquema de
-      encabezados. Aquí el peso lo da la tipografía, no la etiqueta.
-
-      Sobre el copy: la promesa se ata a "no te sirve" y a un mes realmente
-      usado, no a "no me gustó". La condición se redacta como el CUÁNDO aplica
-      y no como una lista de exclusiones — dice lo mismo y no suena a letra
-      chica. El detalle fino va en los términos del contrato, no aquí.
+      Aquí vivía la tarjeta de «garantía del primer mes». Se movió a
+      <Pricing />: «si no te sirve, te devolvemos el mes» es un manejo de
+      objeción de PRECIO, y llevaba tres secciones de distancia con el sitio
+      donde se dice el precio. La sección cierra en el paso 3, que es donde
+      termina lo que cuenta.
     */}
-    <Reveal delay={320} class="mt-20 md:mt-24">
-      <div
-        class="relative mx-auto max-w-3xl rounded-2xl border-2 border-text bg-surface px-6 pt-9 pb-7 shadow-[5px_5px_0_0_var(--text)] sm:px-9"
-      >
-        <Sticker tone="mint" rotate={-3} class="absolute -top-4 left-6 sm:left-9">
-          garantía del primer mes
-        </Sticker>
-
-        <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-9">
-          <p class="font-display text-2xl font-semibold text-balance sm:flex-1 md:text-[1.75rem]">
-            Si no te sirve, te devolvemos el mes
-          </p>
-
-          {/*
-            El filete solo existe apilado. En fila, el salto de tamaño entre
-            las dos columnas ya separa lo suficiente y una línea vertical
-            sobraría.
-          */}
-          <p
-            class="border-t border-line pt-5 text-sm leading-relaxed text-text-muted text-pretty sm:w-60 sm:shrink-0 sm:border-t-0 sm:pt-0"
-          >
-            Aplica al primer mes con todo montado y andando. Sin contrato de permanencia:
-            cancelas por el mismo WhatsApp.
-          </p>
-        </div>
-      </div>
-    </Reveal>
   </div>
 </section>

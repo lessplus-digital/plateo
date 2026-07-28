@@ -1,0 +1,359 @@
+---
+/**
+ * Visor a pantalla completa para una colección de imágenes.
+ *
+ * Por qué `<dialog>` nativo y no una librería (PhotoSwipe pesa ~30 KB): el
+ * elemento ya trae capa superior, atrapado del foco, cierre con Esc, `::backdrop`
+ * y devolución del foco al disparador. Todo eso es lo caro de un lightbox, y
+ * viene en el navegador.
+ *
+ * Uso — el disparador es cualquier botón con `data-lightbox="<id>"`:
+ *
+ *   <button data-lightbox="panel" data-lightbox-title="…" data-lightbox-body="…"
+ *           data-lightbox-full={full.src} data-lightbox-w={full.width} …>
+ *     <img … />   ← la miniatura, obligatoria
+ *   </button>
+ *   <Lightbox id="panel" label="Pantallas del panel" />
+ *
+ * Los botones se buscan en todo el documento por su `data-lightbox`, así que
+ * el visor puede vivir fuera del carrusel (y debe: dentro heredaría el
+ * `overflow` del track).
+ *
+ * La imagen grande (`data-lightbox-full`) se genera aparte con `getImage()` y
+ * NO se descarga hasta que alguien abre el visor. Mientras llega se muestra la
+ * miniatura, que ya está en caché: no hay hueco en blanco, la foto solo se
+ * afina. Si no se pasa, el visor se queda con la miniatura y funciona igual.
+ */
+interface Props {
+  /** Debe coincidir con el `data-lightbox` de los disparadores. */
+  id: string;
+  /** Nombre accesible del diálogo. */
+  label: string;
+}
+
+const { id, label } = Astro.props;
+
+const CHROME =
+  'grid size-11 shrink-0 place-items-center rounded-full border-2 border-navy-900 bg-surface text-navy-900 transition duration-200 ease-out-cubic hover:bg-accent hover:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:border-line-strong disabled:text-text-faint';
+---
+
+<dialog
+  data-lightbox-dialog={id}
+  aria-label={label}
+  class="m-0 max-h-none max-w-none overflow-hidden border-0 bg-transparent p-0 backdrop:bg-navy-975/80 backdrop:backdrop-blur-sm"
+>
+  {/* La rejilla ocupa la ventana entera: el hueco alrededor del panel es la
+      zona de cierre por clic. */}
+  <div class="grid h-dvh w-screen place-items-center p-3 md:p-6" data-lightbox-surface>
+    <div
+      class="flex max-h-full w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_24px_60px_-12px_var(--color-navy-975)]"
+    >
+      <header class="flex items-center gap-4 border-b border-line px-4 py-3 md:px-5">
+        <div class="min-w-0">
+          <h2 class="truncate text-base font-semibold md:text-lg" data-lightbox-title></h2>
+          <p class="mt-0.5 text-xs tracking-wide text-text-faint tnum">
+            <span data-lightbox-index></span> de <span data-lightbox-total></span>
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class={`${CHROME} ml-auto`}
+          aria-label="Cerrar"
+          data-lightbox-close
+        >
+          <svg
+            viewBox="0 0 24 24"
+            class="size-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            aria-hidden="true"
+          >
+            <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"></path>
+          </svg>
+        </button>
+      </header>
+
+      {/*
+        Alto FIJO, no ajustado a la imagen. Las capturas no comparten relación
+        de aspecto, así que con un marco elástico el panel crecía y encogía al
+        pasar de lámina y las flechas del pie se movían bajo el cursor: había
+        que volver a buscarlas en cada paso. Ahora la que se ajusta al marco es
+        la imagen, y lo que sobra queda como aire a los lados.
+
+        El marco hace además de ventana: en zoom la captura se sale y se navega
+        desplazándola, que es la única forma de leer una tabla en un móvil.
+      */}
+      <div class="h-[62vh] min-h-0 bg-surface-sunken" data-lightbox-frame>
+        <img data-lightbox-img alt="" decoding="async" />
+      </div>
+
+      <footer
+        class="flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-line px-4 py-3 md:px-5"
+      >
+        <p
+          class="min-w-[12rem] flex-1 text-sm text-text-muted text-pretty"
+          data-lightbox-body
+        >
+        </p>
+
+        <div class="ml-auto flex items-center gap-2">
+          <button type="button" class={CHROME} data-lightbox-zoom aria-pressed="false">
+            <span class="sr-only" data-lightbox-zoom-label>Ampliar al tamaño real</span>
+            <svg
+              viewBox="0 0 24 24"
+              class="size-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="6.5"></circle>
+              <path d="M15.8 15.8L21 21" stroke-linecap="round"></path>
+              <path d="M8.2 11h5.6" stroke-linecap="round" data-lightbox-zoom-bar></path>
+              <path d="M11 8.2v5.6" stroke-linecap="round" data-lightbox-zoom-plus></path>
+            </svg>
+          </button>
+
+          <button type="button" class={CHROME} aria-label="Anterior" data-lightbox-prev>
+            <svg
+              viewBox="0 0 24 24"
+              class="size-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              aria-hidden="true"
+            >
+              <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </button>
+
+          <button type="button" class={CHROME} aria-label="Siguiente" data-lightbox-next>
+            <svg
+              viewBox="0 0 24 24"
+              class="size-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              aria-hidden="true"
+            >
+              <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  /*
+    Dos estados de la imagen dentro de un marco que nunca cambia de tamaño:
+
+    - ajustada  -> cabe entera, centrada, y el resto del marco queda vacío.
+                   El límite es el 100% del marco, no una fracción del alto de
+                   la ventana: así el panel mide lo mismo en todas las láminas.
+    - a tamaño  -> ancho fijo de 1600px. El marco se desborda y se desplaza.
+                   Es lo que hace legible una tabla del panel en un teléfono.
+
+    El centrado se apaga en zoom: en un contenedor con scroll, un hijo centrado
+    que se desborda deja inalcanzable su esquina superior izquierda.
+  */
+  /*
+    Ajustada no hay nada que desplazar, y `auto` sacaba igualmente una barra:
+    la imagen encaja por el ancho y su alto redondeado se pasa del marco por
+    una fracción de píxel. El scroll se enciende solo con el zoom.
+  */
+  [data-lightbox-frame] {
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  [data-lightbox-img] {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    /*
+      Un item de grid arranca con `min-height: auto`, que para una imagen es su
+      tamaño intrínseco y gana sobre el `max-height`. Sin esto las capturas más
+      altas se pasaban del marco y quedaban recortadas por arriba y por abajo.
+    */
+    min-width: 0;
+    min-height: 0;
+    cursor: zoom-in;
+  }
+
+  [data-lightbox-frame][data-zoom] {
+    place-items: start;
+    overflow: auto;
+  }
+
+  [data-lightbox-frame][data-zoom] [data-lightbox-img] {
+    width: 1600px;
+    max-width: none;
+    max-height: none;
+    cursor: zoom-out;
+  }
+
+  /* En zoom el icono de la lupa pierde el trazo vertical: pasa de + a −. */
+  [data-lightbox-zoom][aria-pressed='true'] [data-lightbox-zoom-plus] {
+    display: none;
+  }
+
+  /*
+    Entrada y salida sin JS. `@starting-style` da el estado inicial y
+    `allow-discrete` mantiene el elemento en el DOM mientras se va; los
+    navegadores que no lo soporten simplemente abren y cierran en seco.
+  */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-lightbox-dialog],
+    [data-lightbox-dialog]::backdrop {
+      transition:
+        opacity 0.28s var(--ease-out-cubic),
+        transform 0.28s var(--ease-out-cubic),
+        overlay 0.28s allow-discrete,
+        display 0.28s allow-discrete;
+    }
+
+    [data-lightbox-dialog] {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+
+    [data-lightbox-dialog][open] {
+      opacity: 1;
+      transform: none;
+    }
+
+    [data-lightbox-dialog]::backdrop {
+      opacity: 0;
+    }
+
+    [data-lightbox-dialog][open]::backdrop {
+      opacity: 1;
+    }
+
+    @starting-style {
+      [data-lightbox-dialog][open] {
+        opacity: 0;
+        transform: scale(0.97);
+      }
+
+      [data-lightbox-dialog][open]::backdrop {
+        opacity: 0;
+      }
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLDialogElement>('[data-lightbox-dialog]').forEach((dialog) => {
+    const id = dialog.dataset.lightboxDialog;
+    const items = Array.from(
+      document.querySelectorAll<HTMLElement>(`[data-lightbox="${id}"]`),
+    );
+    if (!items.length) return;
+
+    const q = <T extends Element>(sel: string) => dialog.querySelector<T>(sel);
+
+    const view = q<HTMLImageElement>('[data-lightbox-img]');
+    const frame = q<HTMLElement>('[data-lightbox-frame]');
+    const title = q<HTMLElement>('[data-lightbox-title]');
+    const body = q<HTMLElement>('[data-lightbox-body]');
+    const index = q<HTMLElement>('[data-lightbox-index]');
+    const prev = q<HTMLButtonElement>('[data-lightbox-prev]');
+    const next = q<HTMLButtonElement>('[data-lightbox-next]');
+    const zoom = q<HTMLButtonElement>('[data-lightbox-zoom]');
+    const zoomLabel = q<HTMLElement>('[data-lightbox-zoom-label]');
+    const surface = q<HTMLElement>('[data-lightbox-surface]');
+    if (!view || !frame || !title || !body || !index || !prev || !next || !zoom) return;
+
+    const total = q<HTMLElement>('[data-lightbox-total]');
+    if (total) total.textContent = String(items.length);
+
+    let current = 0;
+    /* Descarta la imagen grande que llegue tarde si ya se cambió de lámina. */
+    let token = 0;
+
+    const setZoom = (on: boolean) => {
+      frame.toggleAttribute('data-zoom', on);
+      zoom.setAttribute('aria-pressed', String(on));
+      if (zoomLabel) zoomLabel.textContent = on ? 'Ajustar a la ventana' : 'Ampliar al tamaño real';
+      if (!on) frame.scrollTo({ top: 0, left: 0 });
+    };
+
+    const show = (i: number) => {
+      current = (i + items.length) % items.length;
+      const item = items[current];
+      const thumb = item.querySelector('img');
+      const full = item.dataset.lightboxFull;
+
+      title.textContent = item.dataset.lightboxTitle ?? '';
+      body.textContent = item.dataset.lightboxBody ?? '';
+      index.textContent = String(current + 1);
+      view.alt = thumb?.alt ?? '';
+
+      /* Las medidas van antes que el src: reservan el hueco y evitan que el
+         marco pegue un salto entre la miniatura y la imagen grande. */
+      const w = Number(item.dataset.lightboxW);
+      const h = Number(item.dataset.lightboxH);
+      if (w && h) {
+        view.width = w;
+        view.height = h;
+      }
+
+      setZoom(false);
+
+      const stamp = ++token;
+      view.src = thumb?.currentSrc || thumb?.src || full || '';
+
+      if (full && view.src !== full) {
+        const pre = new Image();
+        pre.onload = () => {
+          if (stamp === token) view.src = full;
+        };
+        pre.src = full;
+      }
+    };
+
+    const open = (i: number) => {
+      show(i);
+      if (!dialog.open) dialog.showModal();
+    };
+
+    items.forEach((item, i) => {
+      item.addEventListener('click', () => open(i));
+    });
+
+    prev.addEventListener('click', () => show(current - 1));
+    next.addEventListener('click', () => show(current + 1));
+    zoom.addEventListener('click', () => setZoom(!frame.hasAttribute('data-zoom')));
+    view.addEventListener('click', () => setZoom(!frame.hasAttribute('data-zoom')));
+
+    q<HTMLButtonElement>('[data-lightbox-close]')?.addEventListener('click', () => dialog.close());
+
+    /* Clic en el hueco de alrededor. Se comprueba el objetivo exacto para no
+       cerrar cuando el clic viene de dentro del panel y burbujea hasta aquí. */
+    surface?.addEventListener('click', (e) => {
+      if (e.target === surface) dialog.close();
+    });
+
+    dialog.addEventListener('keydown', (e) => {
+      // Con la imagen ampliada las flechas son para desplazarla: es la única
+      // forma de recorrer una tabla sin ratón. Solo navegan en modo ajustado.
+      if (frame.hasAttribute('data-zoom')) return;
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        show(current - 1);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        show(current + 1);
+      }
+    });
+  });
+</script>

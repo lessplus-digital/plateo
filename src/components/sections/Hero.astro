@@ -92,8 +92,19 @@ const CHAT: Mensaje[] = [
           </p>
         </Reveal>
 
+        {/*
+          El primario va a `whatsappDemo` —el agente en producción de una
+          pizzería— y NO a `whatsapp`, que es nuestro canal de ventas. Es el
+          único sitio del sitio que apunta ahí, y a propósito: aquí el visitante
+          todavía no quiere hablar con un comercial, quiere ver si la cosa
+          funciona. La forma más corta de demostrarlo es dejarle pedir a un
+          Plateo de verdad.
+
+          Quien ya quiere hablar con nosotros tiene el "Agendar una demo" del
+          header, que baja al cierre de la página.
+        */}
         <Reveal delay={220} class="mt-9 flex flex-wrap items-center gap-3">
-          <Button href={LINKS.whatsapp} variant="primary" size="lg" external arrow>
+          <Button href={LINKS.whatsappDemo} variant="primary" size="lg" external arrow>
             Probarlo por WhatsApp
           </Button>
           <Button href="#en-vivo" variant="secondary" size="lg">Ver cómo funciona</Button>
@@ -141,8 +152,18 @@ const CHAT: Mensaje[] = [
         */}
         <Reveal delay={300} class="mt-8 flex items-center gap-0.5 pl-1">
           <Doodle shape="arrow-flow" tone="violet" width={54} rotate={-3} delay={520} />
+          {/*
+            La nota cambió de trabajo cuando el botón pasó a apuntar al agente
+            de demostración. Antes prometía «te contestamos con el menú de tu
+            propio local», que sigue siendo verdad pero ya lo dice el cierre de
+            la página; aquí hacía falta avisar de a QUIÉN se le está
+            escribiendo. Sin esto, quien pulse cree que nos escribe a nosotros,
+            recibe una carta de pizzas y se va pensando que se equivocó de
+            número. Que el objeto de la derecha sea justo un chat de pizzería
+            remata el aviso.
+          */}
           <p class="handwritten -translate-y-[5px] text-text-muted">
-            te contestamos con el menú de tu propio local
+            es una pizzería de prueba: pídele algo
           </p>
         </Reveal>
 

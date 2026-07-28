@@ -1,0 +1,333 @@
+---
+import Button from '../ui/Button.astro';
+import Reveal from '../ui/Reveal.astro';
+import Mark from '../ui/Mark.astro';
+import Sticker from '../ui/Sticker.astro';
+import { LINKS, PRECIOS } from '../../consts';
+
+/**
+ * Precio.
+ *
+ * Va la penúltima, entre <Testimonial /> y <CTA />: el precio se responde al
+ * final, cuando ya hay valor demostrado y alguien a quien le funcionó.
+ *
+ * ── Un objeto, no una tabla ───────────────────────────────────────────────
+ *
+ * Hubo una versión con dos planes en columnas, franja de "varios locales",
+ * fila de letra pequeña en tres columnas y tarjeta de garantía aparte. Medía
+ * 3.000 px —la sección más larga de la página, para decir un número— y era
+ * exactamente la forma de cualquier página de precios generada.
+ *
+ * Esta es la rejilla asimétrica que ya usa <Features />: el argumento a la
+ * izquierda, un solo objeto a la derecha. Cabe en una pantalla.
+ *
+ * ── El conmutador es CSS, sin una línea de JS ─────────────────────────────
+ *
+ * Dos radios `sr-only` y hermanos generales (`~`) en el <style> de abajo. Los
+ * dos precios están en el HTML desde el principio y el CSS esconde el que no
+ * toca, así que funciona con el JS caído, no parpadea al cargar y no arrastra
+ * hidratación. Es el orden que pide CLAUDE.md: CSS antes que nada.
+ *
+ * Ojo si tocas el marcado: los `<input>` tienen que seguir siendo HERMANOS
+ * ANTERIORES de `.cuerpo`. El combinador `~` no sube ni retrocede — mételos
+ * dentro de un <div> "para ordenar" y el conmutador deja de funcionar sin dar
+ * ningún error.
+ */
+
+/*
+  Puntos de millar, sin decimales y sin el código ISO detrás. `Intl` con
+  `style: 'currency'` escupe "$ 490.000,00 COP", que en una tarjeta de precio es
+  ruido: el símbolo lo pone el marcado y más pequeño que la cifra.
+*/
+const pesos = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
+---
+
+{/*
+  `bg-surface` explícito y sin `anchor-to-content`: <Testimonial /> es
+  `bg-surface-sunken`, así que al saltar al ancla hay corte de color y se lee
+  como el principio de la sección. La corrección de aterrizaje es para las
+  secciones transparentes que van detrás de una oscura — ver global.css.
+*/}
+<section id="precios" class="bg-surface py-24 md:py-32">
+  <div class="container-page">
+    <div class="grid gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-20">
+      {/* ===== Izquierda: por qué este número ===== */}
+      <div>
+        <Reveal variant="fade">
+          <p class="text-xs font-semibold tracking-[0.18em] text-accent-2-ink uppercase">
+            Precio
+          </p>
+        </Reveal>
+
+        {/*
+          El <Mark /> va en las últimas palabras: el trazo se dibuja por debajo
+          de la línea base y marcando algo en mitad del titular cruza por encima
+          del renglón siguiente.
+
+          Violeta subrayado porque las otras tres marcas de la página ya están
+          cogidas —menta subrayada en el hero y en Features, violeta en círculo
+          en Steps—. Cuatro trazos idénticos se leen como un tic.
+        */}
+        <Reveal as="h2" delay={70} class="mt-4 text-4xl font-semibold text-balance md:text-5xl">
+          Un precio fijo, nunca{' '}
+          <Mark variant="underline" tone="violet" delay={560}>una comisión</Mark>
+        </Reveal>
+
+        <Reveal delay={140} class="mt-6 text-lg text-text-muted text-pretty">
+          <p>
+            Las plataformas de domicilio se llevan entre el 25% y el 30% de cada pedido: cuanto
+            mejor te va, más pagas. Aquí el mes que vendas el doble pagas lo mismo.
+          </p>
+        </Reveal>
+
+        {/*
+          Aquí hubo una flecha con nota manuscrita, «y el primer mes va con
+          garantía». Se quitó por dos motivos, y los dos valen para la próxima
+          que se proponga:
+
+          1. Repetía la pegatina de la tarjeta —«garantía del primer mes»— a
+             diez centímetros de distancia y en la misma pantalla.
+          2. Con el <Mark /> del titular y la pegatina, la nota era el tercer
+             recurso gráfico en 800 px de sección. El lenguaje de la página
+             (marcador, garabatos, pegatinas) funciona porque aparece contado;
+             amontonado deja de leerse como anotación y pasa a decoración.
+
+          Se probaron alternativas —una nota que invitara a pulsar el
+          conmutador— y ninguna sobrevive a la primera pregunta: la flecha
+          apunta desde esta columna hacia el vacío, no hacia el control, que
+          está 250 px más arriba y en la otra mitad de la rejilla.
+        */}
+
+        {/*
+          Los de varios locales, en una línea. No son un plan y fingir que lo
+          son obliga a dejarles un hueco donde va la cifra.
+        */}
+        <Reveal delay={200} class="mt-10 border-t border-line pt-6">
+          <p class="text-[0.95rem] text-text-muted text-pretty">
+            ¿Tienes varias sedes?{' '}
+            <a
+              href={LINKS.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-medium text-accent-2-ink underline-offset-4 hover:underline"
+            >
+              Lo cuadramos por WhatsApp
+            </a>{' '}
+            — cada una con su número y su cocina, y un consolidado de todas.
+          </p>
+        </Reveal>
+      </div>
+
+      {/* ===== Derecha: la tarjeta ===== */}
+      <Reveal variant="scale" delay={180} blur={10}>
+        <div class="relative">
+          {/*
+            La única pegatina de la sección, colgada de la esquina como se pega
+            una pegatina de verdad. Sustituye a la tarjeta de papel de la
+            garantía que había antes aquí: 150 px de sección para una promesa
+            que cabe en cinco palabras y una línea de letra chica.
+          */}
+          <Sticker tone="mint" rotate={-4} class="absolute -top-3.5 left-7 z-10 sm:left-9">
+            garantía del primer mes
+          </Sticker>
+
+          <div class="rounded-2xl bg-surface-inverse px-7 pt-11 pb-8 sm:px-9 sm:pt-12 sm:pb-9">
+            {/*
+              Los dos radios. Van AQUÍ, antes de `.cuerpo`, porque todo el CSS
+              del conmutador cuelga de `~` (ver el aviso de la cabecera).
+              `checked` en el mensual: es el que menos compromiso pide y el que
+              hay que enseñar por defecto.
+            */}
+            <input class="sr-only" type="radio" name="ciclo" id="ciclo-mensual" checked />
+            <input class="sr-only" type="radio" name="ciclo" id="ciclo-anual" />
+
+            <div class="cuerpo">
+              {/* Conmutador. Las <label> son el control visible; los radios, el real. */}
+              <div
+                class="inline-flex rounded-full border border-line-inverse p-1 text-sm font-medium"
+              >
+                <label for="ciclo-mensual" class="ciclo-btn">Mensual</label>
+                <label for="ciclo-anual" class="ciclo-btn">
+                  Anual
+                  <span class="ciclo-off">−{PRECIOS.anualDescuento}%</span>
+                </label>
+              </div>
+
+              {/*
+                `tnum`: las cifras tabulares no cambian de ancho al alternar
+                entre 490.000 y 390.000, así que el "COP / mes" de al lado no
+                da un brinco lateral cada vez que se pulsa el conmutador.
+
+                `text-5xl` hasta `sm` y no `text-6xl` a secas: medido en un
+                móvil de 390 px, la tarjeta deja 294 px por dentro y la fila a
+                60 px de cuerpo pide 324 — "COP / mes" se partía en dos
+                renglones al lado del precio. A 48 px cabe entera con holgura.
+              */}
+              <p class="mt-7 flex items-baseline gap-1.5">
+                <span class="text-xl font-medium text-text-inverse-muted">$</span>
+                <span class="tnum font-display text-5xl font-semibold tracking-tight text-text-inverse sm:text-6xl">
+                  <span data-ciclo="mensual">{pesos.format(PRECIOS.mensual)}</span>
+                  <span data-ciclo="anual">{pesos.format(PRECIOS.anual)}</span>
+                </span>
+                <span class="text-sm text-text-inverse-muted">{PRECIOS.moneda} / mes</span>
+              </p>
+
+              <p class="mt-2 text-sm text-text-inverse-muted">
+                <span data-ciclo="mensual">Se cobra mes a mes, sin permanencia.</span>
+                <span data-ciclo="anual">
+                  Son ${pesos.format(PRECIOS.anualTotal)} al año. Te ahorras{' '}
+                  <strong class="font-semibold text-accent">
+                    ${pesos.format(PRECIOS.anualAhorro)}
+                  </strong>.
+                </span>
+              </p>
+
+              {/*
+                Tres líneas y ni una más. Guion largo en vez de chulito verde:
+                seis chulitos repetidos son el sello de la tabla de precios de
+                plantilla, y aquí no marcan casillas de una comparativa — son
+                frases.
+              */}
+              <ul
+                class="mt-8 space-y-2.5 border-t border-line-inverse pt-7 text-[0.95rem] text-text-inverse-muted text-pretty"
+              >
+                <li class="flex gap-2.5">
+                  <span class="select-none text-accent" aria-hidden="true">—</span>
+                  <span>El agente y el panel completos. Ninguna función bloqueada.</span>
+                </li>
+                <li class="flex gap-2.5">
+                  <span class="select-none text-accent" aria-hidden="true">—</span>
+                  {/*
+                    Aquí iba, detrás del precio, «una comisión del 25% sobre un
+                    pedido de $45.000 son $11.250». Se quitó: obliga al lector a
+                    seguir una cuenta con tres cifras nuevas —un porcentaje, un
+                    ticket de ejemplo y su resultado— justo en el renglón donde
+                    tiene que entender cuánto le van a cobrar A ÉL. El que no la
+                    sigue se queda pensando que $11.250 es algún cargo de
+                    Plateo, que es el malentendido más caro posible en una
+                    tarjeta de precio.
+
+                    La comparación no se pierde: el párrafo de la izquierda ya
+                    dice que las plataformas se llevan el 25-30% de cada pedido.
+                    Ahí es un argumento; aquí era una operación aritmética.
+                  */}
+                  <span>
+                    Hasta {pesos.format(PRECIOS.pedidosIncluidos)} pedidos al mes. Por encima,
+                    ${pesos.format(PRECIOS.pedidoExtra)} cada uno.
+                  </span>
+                </li>
+                <li class="flex gap-2.5">
+                  <span class="select-none text-accent" aria-hidden="true">—</span>
+                  <span>
+                    <span data-ciclo="mensual">
+                      Implementación: ${pesos.format(PRECIOS.implementacion)}, una sola vez.
+                      Montamos tu menú y conectamos tu WhatsApp.
+                    </span>
+                    <span data-ciclo="anual">
+                      <strong class="font-semibold text-text-inverse">
+                        Implementación incluida
+                      </strong>{' '}
+                      —montamos tu menú y conectamos tu WhatsApp sin cobrarte los{' '}
+                      ${pesos.format(PRECIOS.implementacion)}.
+                    </span>
+                  </span>
+                </li>
+              </ul>
+
+              <div class="mt-8">
+                <Button
+                  href={LINKS.whatsapp}
+                  variant="primary"
+                  size="lg"
+                  external
+                  arrow
+                  class="w-full"
+                >
+                  Agendar una demo
+                </Button>
+                <p class="mt-3.5 text-center text-xs text-text-inverse-faint">
+                  Precios en pesos colombianos, sin IVA. Cancelas por el mismo WhatsApp.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Reveal>
+    </div>
+  </div>
+</section>
+
+<style>
+  /*
+    Conmutador mensual / anual, sin JS.
+
+    Los dos textos están en el HTML y el CSS esconde el que no corresponde. Eso
+    da tres cosas gratis: funciona con el JS caído, no hay parpadeo al cargar
+    (nada se pinta y se corrige después) y el buscador indexa los dos precios.
+
+    Va en un <style> de componente y no en utilidades de Tailwind porque las
+    variantes `peer-*` generan `.peer:checked ~ .destino`, y eso exige que el
+    destino sea HERMANO del input. Aquí los destinos están dentro de `.cuerpo`,
+    a varios niveles de profundidad: hace falta `~ .cuerpo <descendiente>`, que
+    Tailwind no sabe expresar.
+  */
+  [data-ciclo] {
+    /* `inline` y no `block`: estos tramos van dentro de un párrafo. */
+    display: inline;
+  }
+
+  #ciclo-mensual:checked ~ .cuerpo [data-ciclo='anual'],
+  #ciclo-anual:checked ~ .cuerpo [data-ciclo='mensual'] {
+    display: none;
+  }
+
+  .ciclo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 9999px;
+    padding: 0.4rem 0.9rem;
+    color: var(--text-inverse-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background-color 0.2s var(--ease-out-cubic),
+      color 0.2s var(--ease-out-cubic);
+  }
+
+  .ciclo-btn:hover {
+    color: var(--text-inverse);
+  }
+
+  #ciclo-mensual:checked ~ .cuerpo label[for='ciclo-mensual'],
+  #ciclo-anual:checked ~ .cuerpo label[for='ciclo-anual'] {
+    background-color: var(--accent);
+    color: var(--color-navy-900);
+  }
+
+  /*
+    El foco tiene que verse en la <label>, porque el input real es `sr-only` y
+    no se ve. Menta y no el violeta del `:focus-visible` global: sobre el navy
+    de la tarjeta el violeta casi no se despega del fondo.
+  */
+  #ciclo-mensual:focus-visible ~ .cuerpo label[for='ciclo-mensual'],
+  #ciclo-anual:focus-visible ~ .cuerpo label[for='ciclo-anual'] {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* La pastilla del descuento, dentro del botón de "Anual". */
+  .ciclo-off {
+    border-radius: 9999px;
+    background-color: var(--accent-2);
+    padding: 0.1rem 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  /* Sobre el relleno menta del botón activo, el violeta pierde contraste. */
+  #ciclo-anual:checked ~ .cuerpo label[for='ciclo-anual'] .ciclo-off {
+    background-color: var(--color-navy-900);
+  }
+</style>

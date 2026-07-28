@@ -6,30 +6,50 @@ import Mark from '../ui/Mark.astro';
 import Doodle from '../ui/Doodle.astro';
 
 /**
- * Las siete capacidades del producto, nombradas y punto.
+ * Las capacidades del producto, con lo que cada una le ahorra o le gana al
+ * local pegado detrás.
  *
- * Esta sección NO tiene que convencer: tiene que dar la medida de lo que hace
- * el producto y pasarle el turno a <LiveDemo />, que es el momento fuerte de
- * la página. Un cliente que llega agotado al demo ya no lo mira.
+ * Es la segunda pantalla, justo antes de <LiveDemo />: aquí el visitante
+ * decide si esto le sirve o si sigue bajando por inercia. Tiene que dar la
+ * medida de TODO lo que hace el servicio y pasarle el turno al demo, que es el
+ * momento fuerte de la página. Un cliente que llega agotado al demo ya no lo
+ * mira.
  *
- * De ahí las dos reglas de las que no conviene salirse:
+ * De ahí las tres reglas de las que no conviene salirse:
  *
  * 1. Dos o tres líneas por capacidad, nunca un párrafo. Lo justo para que se
  *    entienda el mecanismo —qué hace y cómo—, y ni una frase más: lo demás lo
  *    enseña el demo mucho mejor de lo que puede contarlo un texto.
- * 2. Nada de cuadrícula de tarjetas iguales. Seis o siete tarjetas con icono,
- *    título y párrafo del mismo largo es exactamente la forma que tiene una
- *    página generada; además, cuenta que las siete cosas pesan igual, y no es
- *    verdad. Aquí van en una lista con filetes, y solo la primera —el agente—
- *    se sale de la norma con sus tres etiquetas.
+ * 2. Cada `body` abre en el resultado y cierra en la consecuencia; la función
+ *    va en medio, si cabe. "Manda el recordatorio" es una casilla de una tabla
+ *    comparativa; "menos mesas apartadas que nadie ocupa" es el motivo por el
+ *    que alguien paga. Y el título nombra lo que el dueño ya llama así:
+ *    "Métricas", no "Números"; "Pasa a un humano", no "Relevo humano". Si hay
+ *    que explicar la palabra, la palabra está mal.
+ * 3. Nada de cuadrícula de tarjetas iguales. Media docena de tarjetas con
+ *    icono, título y párrafo del mismo largo es exactamente la forma que tiene
+ *    una página generada; además, cuenta que todas las cosas pesan igual, y no
+ *    es verdad. Aquí van en una lista con filetes, y solo la primera —el
+ *    agente— se sale de la norma con sus tres etiquetas.
+ *
+ * El titular tampoco cuenta capacidades. Decía "Siete trabajos que se
+ * automatizan": un inventario, y encima obligaba a revisar el número cada vez
+ * que se toca la lista. Ahora nombra lo que el local se lleva, y la lista
+ * puede crecer sin que haya que tocar nada más.
  *
  * Antes esto era una cuadrícula con tarjeta navy, gráfica de barras y cuadros
  * de color en menta y violeta. Se quitó todo: demasiada tinta y demasiado
  * ruido para una sección de paso.
  */
 
-/** Lo que separa al agente de un bot de árbol de opciones. */
-const RASGOS = ['sin respuestas fijas', 'recuerda a cada cliente', 'cualquier idioma'];
+/**
+ * Lo que separa al agente de un bot de árbol de opciones.
+ *
+ * La disponibilidad NO va aquí aunque sea el argumento más fuerte: ya la dice
+ * el párrafo de la izquierda, y repetirla en una etiqueta gasta uno de los
+ * tres huecos en algo que el lector acaba de leer.
+ */
+const RASGOS = ['sin respuestas fijas', 'recuerda a cada cliente', 'más de 50 idiomas'];
 
 interface Capacidad {
   /** El nombre sale del propio <Icon />, así no se pueden desincronizar. */
@@ -44,38 +64,43 @@ const CAPACIDADES: Capacidad[] = [
   {
     icon: 'agente',
     title: 'Agente de IA',
-    body: 'Entiende lo que le escriben, no un menú de opciones. Sigue el hilo de la conversación, consulta tu menú antes de responder y le entiende igual a quien manda audios o escribe con afán.',
+    body: 'Atiende como un miembro de tu equipo, no como un menú de opciones. Entiende mensajes, audios y conversaciones completas para responder con tu carta, tus precios y las reglas de tu restaurante.',
     rasgos: true,
   },
   {
     icon: 'pedido',
     title: 'Pedidos',
-    body: 'Agrega, quita y cambia productos sobre la marcha, sugiere adiciones, calcula el total y confirma el comprobante de la transferencia. Llega a cocina ya cuadrado.',
+    body: 'Toma pedidos, modifica productos, sugiere adiciones, calcula el total y recibe el comprobante de pago. A cocina solo llegan pedidos completos y listos para preparar.',
   },
   {
     icon: 'reservas',
     title: 'Reservas',
-    body: 'Aparta, reagenda y cancela mesas por chat, y manda el recordatorio antes de la hora. La agenda queda a la vista de todo el turno.',
+    body: 'Agenda, reprograma y cancela reservas desde WhatsApp. También recuerda la visita al cliente para reducir las mesas que quedan vacías.',
   },
   {
     icon: 'atencion',
-    title: 'Respuestas',
-    body: 'Horarios, hasta dónde llega el domicilio, medios de pago, tiempos de entrega y cómo llegar. Las mismas veinte preguntas de siempre, sin sacar a nadie de la cocina.',
+    title: 'Preguntas frecuentes',
+    body: 'Responde al instante preguntas sobre horarios, domicilio, medios de pago, ubicación o cualquier duda frecuente, sin interrumpir el trabajo del equipo.',
+  },
+  {
+    icon: 'clientes',
+    title: 'Clientes',
+    body: 'Recuerda quién es cada cliente, qué suele pedir y dónde vive. Cada conversación se vuelve más rápida y personalizada que la anterior.',
   },
   {
     icon: 'estadisticas',
-    title: 'Estadísticas',
-    body: 'Ventas del día, ticket promedio, horas pico y los platos que más salen. Para decidir cuánta masa dejar lista el viernes o a qué hora reforzar el turno.',
+    title: 'Métricas',
+    body: 'Consulta ventas, ticket promedio, horas pico y productos más vendidos para tomar mejores decisiones todos los días.',
   },
   {
     icon: 'resenas',
     title: 'Reseñas',
-    body: 'Pregunta cómo estuvo cuando el pedido acaba de llegar. A quien quedó contento le deja listo el camino a Google; si algo falló, te avisa a ti primero.',
+    body: 'Después de cada pedido, Plateo pregunta cómo fue la experiencia. Los clientes satisfechos llegan a Google; los problemas llegan primero a ti.',
   },
   {
     icon: 'soporte',
-    title: 'Soporte',
-    body: 'Entras al chat y respondes tú cuando haga falta, sin perder el hilo de lo que ya venía diciendo el agente. Y si algo se enreda, nos escribes desde el panel.',
+    title: 'Pasa a un humano',
+    body: 'Cuando una conversación necesita intervención, cualquier persona del equipo puede entrar al chat. Plateo retoma la atención automáticamente cuando termina.',
   },
 ];
 ---
@@ -91,15 +116,47 @@ const CAPACIDADES: Capacidad[] = [
           </p>
         </Reveal>
 
+        {/*
+          Tres verbos, y ese es el argumento entero: el agente contesta, el
+          agente vende, y lo que sale de ahí queda cuadrado sin que nadie lo
+          transcriba.
+
+          El corte de línea está medido en la columna real, que es estrecha
+          (0.8fr de la rejilla). "Atiende, vende y deja el turno cuadrado"
+          partía en tres con un "y deja el" suelto en medio; esta parte en dos
+          por la conjunción, que es donde se lee bien. Si tocas el titular,
+          míralo en la página: `text-balance` no reparte estas líneas.
+
+          "Contesta" y no "atiende" porque el h1 ya dice "Un agente IA atiende
+          WhatsApp", y repetir el verbo del hero en la segunda pantalla suena a
+          que no hay nada más que contar.
+
+          El <Mark /> va en las ÚLTIMAS palabras, como en el hero ("el local")
+          y en Steps ("una semana"), y no es manía de simetría: el trazo se
+          dibuja por debajo de la línea base, así que marcando "vende" —final
+          de la primera línea— el subrayado cruzaba por encima de "el turno".
+          Se midió: 20px de solape. En la última línea el trazo cae al aire.
+        */}
         <Reveal as="h2" delay={70} class="mt-4 text-4xl font-semibold text-balance md:text-5xl">
-          Siete trabajos que se{' '}
-          <Mark variant="underline" tone="mint" delay={600}>automatizan</Mark>
+          Contesta, vende y cuadra{' '}
+          <Mark variant="underline" tone="mint" delay={600}>el turno</Mark>
         </Reveal>
 
+        {/*
+          El párrafo abre en lo que se pierde HOY, no en lo que trae Plateo. Es
+          la única frase de la página que nombra el costo de no hacer nada, y va
+          aquí porque es donde el visitante decide si sigue bajando.
+
+          Lo que decía antes —"ninguno le suma una pantalla nueva, ninguno cobra
+          comisión"— era cierto pero ya estaba dicho dos veces más arriba: en el
+          párrafo del hero y en el sello "Sin apps ni comisiones". Gastar la
+          segunda pantalla repitiendo el hero es gastarla.
+        */}
         <Reveal delay={140} class="mt-6 text-lg text-text-muted text-pretty">
           <p>
-            Todos dentro del WhatsApp que ya repartes. Ninguno le suma una pantalla nueva a
-            tu equipo, y ninguno cobra comisión por venta.
+            Cada mensaje que se queda sin responder es un pedido que se fue al de la esquina.
+            El agente los contesta todos, a cualquier hora y con tu carta en la mano, y lo que
+            se cierra entra solo al tablero de la cocina.
           </p>
         </Reveal>
 
@@ -108,7 +165,7 @@ const CAPACIDADES: Capacidad[] = [
             href="#en-vivo"
             class="group inline-flex items-center gap-2 text-sm font-medium text-accent-2-ink underline-offset-4 hover:underline"
           >
-            Míralo trabajando
+            Míralo tomando un pedido
             <svg
               width="15"
               height="15"

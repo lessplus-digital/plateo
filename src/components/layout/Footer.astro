@@ -51,6 +51,13 @@ const socialClass = [
           ajeno metido dentro rompe esa familia. Tampoco se pueden dibujar "a
           mano" como el resto — un logo de red social que no se reconoce al
           instante no cumple su única función.
+
+          El tercero es un SOBRE, no la M de Gmail, y es a propósito. La M solo
+          existe en cuatro colores —en monocromo pierde lo único que la hace
+          reconocible— y ahí al lado de los otros dos se leería como "escríbenos
+          desde Gmail", que no es la idea: el `mailto:` lo abre el cliente de
+          correo que cada quien tenga. El sobre dice "correo" sin pedirle marca
+          a nadie, y comparte retícula de 24 y grosor 1.7 con sus vecinos.
         */}
         <ul class="mt-7 flex items-center gap-3">
           <li>
@@ -96,6 +103,27 @@ const socialClass = [
               </svg>
             </a>
           </li>
+
+          <li>
+            <a href={`mailto:${LINKS.email}`} class={socialClass} aria-label={`Escribirnos a ${LINKS.email}`}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect
+                  x="2.6"
+                  y="4.8"
+                  width="18.8"
+                  height="14.4"
+                  rx="2.6"
+                  stroke="currentColor"
+                  stroke-width="1.7"></rect>
+                <path
+                  d="m3.6 6.9 7.1 5a2.3 2.3 0 0 0 2.6 0l7.1-5"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+              </svg>
+            </a>
+          </li>
         </ul>
       </div>
 
@@ -137,15 +165,12 @@ const socialClass = [
             </a>
           </li>
           {/*
-            El acceso al panel se quitó del header —allí competía con el CTA y
-            mandaba fuera a quien todavía no es cliente— y vive solo aquí, que
-            es donde lo busca quien ya lo tiene.
+            Aquí iba «Entrar al panel». Se quitó porque todavía no hay panel
+            publicado al que mandar a nadie: un enlace que lleva a un dominio
+            que no responde hace más daño que no tenerlo. Cuando exista, vuelve
+            a este sitio —no al header, donde competía con el CTA y mandaba
+            fuera a quien todavía no es cliente— con `LINKS.login`.
           */}
-          <li>
-            <a href={LINKS.login} target="_blank" rel="noopener noreferrer" class={linkClass}>
-              Entrar al panel
-            </a>
-          </li>
         </ul>
       </nav>
     </div>

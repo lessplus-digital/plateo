@@ -1,6 +1,7 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import Carousel from '../ui/Carousel.astro';
+import Lightbox from '../ui/Lightbox.astro';
 import Reveal from '../ui/Reveal.astro';
 
 /*
@@ -11,8 +12,10 @@ import Reveal from '../ui/Reveal.astro';
 import pedidos from '../../assets/pantallas/vista_pedidos.png';
 import soporte from '../../assets/pantallas/vista_soporte.png';
 import reservas from '../../assets/pantallas/vista_reservas.png';
+import disponibilidad from '../../assets/pantallas/vista_disponibilidad.png';
+import clientes from '../../assets/pantallas/vista_clientes.png';
+import fidelidad from '../../assets/pantallas/vista_fidelidad.png';
 import stats from '../../assets/pantallas/vista_stats.png';
-import stats2 from '../../assets/pantallas/vista_stats2.png';
 import reviews from '../../assets/pantallas/vista_reviews.png';
 import historial from '../../assets/pantallas/vista_history.png';
 import negocio from '../../assets/pantallas/vista_infolocal.png';
@@ -24,6 +27,9 @@ import negocio from '../../assets/pantallas/vista_infolocal.png';
  * `astro:assets`: de ahí salen el AVIF/WebP, el redimensionado y los
  * width/height que evitan el salto de layout. Si se dejaran en `public/`
  * viajarían como PNG de 1870px y ~1,4 MB en total.
+ *
+ * El orden no es casual: primero el turno (pedidos, soporte, reservas, menú),
+ * luego los clientes, luego lo que se mide y al final la configuración.
  *
  * Para añadir una pantalla: deja el PNG en `src/assets/pantallas/`, impórtalo
  * arriba y añade su entrada aquí. El titular no menciona cuántas son a
@@ -49,16 +55,28 @@ const SLIDES = [
     alt: 'Calendario semanal de reservas con las mesas apartadas por día y hora.',
   },
   {
+    src: disponibilidad,
+    title: 'Disponibilidad del menú',
+    body: 'Se acabó un producto: lo apagas de un toque y el agente deja de ofrecerlo en la siguiente conversación.',
+    alt: 'Lista de productos del menú con su categoría, precio y descripción, y un interruptor por fila que los marca como disponibles o agotados.',
+  },
+  {
+    src: clientes,
+    title: 'Ficha de clientes',
+    body: 'Nombre, teléfono y dirección. El agente los aprende tomando pedidos y no vuelve a preguntarlos.',
+    alt: 'Tabla de clientes con nombre, teléfono, dirección, modo de atención —bot o humano— y fecha de registro.',
+  },
+  {
+    src: fidelidad,
+    title: 'Clientes fieles y en riesgo',
+    body: 'A quién premiar por volver, y a quién mandarle una promo antes de que se olvide de ti.',
+    alt: 'Dos listas: el ranking de clientes más fieles por número de pedidos y gasto, y los clientes recurrentes que llevan más de treinta días sin pedir.',
+  },
+  {
     src: stats,
     title: 'Estadísticas',
     body: 'Pedidos, ingresos, ticket promedio y cuánto te estás demorando en entregar.',
     alt: 'Panel de estadísticas con indicadores de pedidos e ingresos, una gráfica de evolución y el tiempo de entrega.',
-  },
-  {
-    src: stats2,
-    title: 'Productos y horas pico',
-    body: 'Qué se vende, qué no se vende y a qué hora de qué día entra la plata.',
-    alt: 'Ranking de productos más y menos pedidos junto a un mapa de calor de pedidos por día y hora.',
   },
   {
     src: reviews,
@@ -79,6 +97,16 @@ const SLIDES = [
     alt: 'Formulario de configuración del negocio con identidad, contacto, horarios y datos de operación.',
   },
 ];
+
+/*
+  Versión grande para el visor, una por captura y a resolución original (las
+  pantallas rondan los 1600px de ancho, que es justo lo que necesita el zoom
+  a tamaño real). No se referencia con <Image />, así que nadie la descarga
+  hasta que se abre el lightbox: el peso de la sección no cambia.
+*/
+const FULL = await Promise.all(
+  SLIDES.map(({ src }) => getImage({ src, format: 'webp', quality: 82 })),
+);
 ---
 
 {/* `anchor-to-content`: sección sin fondo, el ancla necesita bajar. Ver global.css. */}
@@ -100,6 +128,9 @@ const SLIDES = [
           Sin módulos de relleno ni menús laterales con cosas que nadie abre. Esto es
           exactamente lo que ve tu equipo desde el primer día.
         </p>
+        <p class="mt-3 text-base text-text-faint">
+          Toca cualquier captura para verla completa y en grande.
+        </p>
       </Reveal>
     </div>
   </div>
@@ -112,16 +143,36 @@ const SLIDES = [
            el usuario arrastra el carrusel, así que van en carga diferida. */
         SLIDES.map(({ src, title, body, alt }, i) => (
           <article class="w-[88vw] shrink-0 snap-start sm:w-[36rem]">
-            <div class="aspect-[2/1] overflow-hidden rounded-xl border border-line bg-surface-sunken">
-              <Image
-                src={src}
-                alt={alt}
-                width={1200}
-                densities={[1, 2]}
-                loading={i < 2 ? 'eager' : 'lazy'}
-                class="size-full object-cover object-top"
-              />
-            </div>
+            <button
+              type="button"
+              class="group block w-full cursor-zoom-in text-left"
+              aria-label={`Ver en grande: ${title}`}
+              data-lightbox="panel"
+              data-lightbox-title={title}
+              data-lightbox-body={body}
+              data-lightbox-full={FULL[i].src}
+              data-lightbox-w={src.width}
+              data-lightbox-h={src.height}
+            >
+              {/*
+                Todo el aviso de que la captura se abre es el cursor de lupa.
+                El hover solo marca el borde y levanta una sombra corta: lo
+                justo para que la tarjeta se sienta viva. Se probó con una
+                pastilla de "Ver en grande" y con un zoom del 2% en la imagen,
+                y las dos ensucian una fila de diez capturas.
+              */}
+              <div class="aspect-[2/1] overflow-hidden rounded-xl border border-line bg-surface-sunken transition duration-300 ease-out-cubic group-hover:border-line-strong group-hover:shadow-[0_6px_20px_-10px_var(--color-navy-900)] group-focus-visible:border-line-strong">
+                <Image
+                  src={src}
+                  alt={alt}
+                  width={1200}
+                  densities={[1, 2]}
+                  loading={i < 2 ? 'eager' : 'lazy'}
+                  class="size-full object-cover object-top"
+                />
+              </div>
+            </button>
+
             <h3 class="mt-4 text-base font-semibold">{title}</h3>
             <p class="mt-1 text-sm text-text-muted text-pretty">{body}</p>
           </article>
@@ -129,4 +180,17 @@ const SLIDES = [
       }
     </Carousel>
   </Reveal>
+
+  {/*
+    Fuera del carrusel a propósito: dentro heredaría el `overflow-x` del track
+    y el diálogo quedaría recortado. Los disparadores lo encuentran por su id.
+  */}
+  <Lightbox id="panel" label="Pantallas del panel de Plateo" />
 </section>
+
+<style>
+  /* Sin script el botón no abre nada: que el cursor no prometa lo contrario. */
+  html.no-js [data-lightbox] {
+    cursor: default;
+  }
+</style>

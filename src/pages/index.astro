@@ -6,6 +6,7 @@ import LiveDemo from '../components/sections/LiveDemo.astro';
 import Steps from '../components/sections/Steps.astro';
 import Showcase from '../components/sections/Showcase.astro';
 import Testimonial from '../components/sections/Testimonial.astro';
+import Pricing from '../components/sections/Pricing.astro';
 import CTA from '../components/sections/CTA.astro';
 ---
 
@@ -19,13 +20,20 @@ import CTA from '../components/sections/CTA.astro';
       Steps       cómo se pone en marcha
       Showcase    cómo se ve por dentro -> aquí van las capturas reales
       Testimonial a quién le funcionó
+      Pricing     cuánto cuesta
       CTA         qué hago ahora
 
     Features no lleva pantallazos a propósito: le robarían el golpe a LiveDemo
     y al Showcase, que es donde de verdad se ven las pantallas.
 
+    Pricing va DESPUÉS de Testimonial y no antes: el precio es lo último que se
+    responde, cuando ya hay valor demostrado y alguien a quien le funcionó que
+    lo justifique. Puesto entre Showcase y Testimonial, el visitante ve la cifra
+    sin nada que la sostenga todavía.
+
     El color alterna claro / oscuro para que el scroll tenga ritmo. Si añades
-    una sección, mira que no queden dos oscuras seguidas.
+    una sección, mira que no queden dos oscuras seguidas. Hoy va:
+    claro · sunken · OSCURA · claro · claro · sunken · claro · OSCURA.
   */}
   <Hero />
   <Features />
@@ -33,5 +41,6 @@ import CTA from '../components/sections/CTA.astro';
   <Steps />
   <Showcase />
   <Testimonial />
+  <Pricing />
   <CTA />
 </Layout>

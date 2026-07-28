@@ -34,8 +34,23 @@ import Logo from '../ui/Logo.astro';
  * - El borde existe siempre, transparente. Si apareciera con el scroll, la
  *   barra crecería 2px y el contenido daría un brinco.
  *
- * Por debajo de `md` el menú se pliega tras un botón y las secciones pasan a
+ * Por debajo de `lg` el menú se pliega tras un botón y las secciones pasan a
  * una tarjeta desplegable. Ver el bloque del panel más abajo.
+ *
+ * El corte está en `lg` y NO en `md`, que es donde estaba, porque en `md` no
+ * cabe. Medido en el navegador: el logo pide 119 px, el botón 159, los dos
+ * huecos 32 y el menú 476 con las cinco secciones — 787 px de contenido contra
+ * los 704 que deja una ventana de 768 con el `px-8` de la barra. Se salía 83.
+ *
+ * Ya se salía antes de añadir «Precios»: con cuatro entradas eran 713 contra
+ * 704, nueve píxeles que pasaban desapercibidos porque el primer enlace se
+ * comía el aire del logo en vez de romper la línea.
+ *
+ * Acortar los rótulos habría sido el otro camino y se descartó: están elegidos
+ * para nombrar las mitades del producto —ver el comentario de NAV en
+ * consts.ts—, y «En vivo» o «Empezar» dejan de decir qué hay al otro lado.
+ * Entre eso y que la tablet use el panel desplegable, que ya está diseñado y
+ * funciona, gana el panel.
  */
 ---
 
@@ -75,7 +90,7 @@ import Logo from '../ui/Logo.astro';
         solo un cambio de color, pero visualmente el menú tiene que seguir
         empezando donde empezaba.
       */}
-      <nav class="hidden items-center md:flex lg:-mx-3" aria-label="Principal">
+      <nav class="hidden items-center lg:-mx-3 lg:flex" aria-label="Principal">
         {
           NAV.map(({ label, href }) => (
             <a
@@ -96,13 +111,13 @@ import Logo from '../ui/Logo.astro';
         pide desde ahí, con el correo como alternativa.
       */}
       {/*
-        El `hidden md:block` va en el <span> y NO en la clase del <Button />:
+        El `hidden lg:block` va en el <span> y NO en la clase del <Button />:
         su clase base lleva `inline-flex`, que gana a `hidden` por el orden en
         que Tailwind emite las reglas. Pasándoselo al componente, el botón se
         seguía viendo en móvil y "Agendar una demo" salía dos veces —una en la
         barra y otra dentro del panel. Mismo caso que las flechas de Steps.
       */}
-      <span class="hidden shrink-0 md:block">
+      <span class="hidden shrink-0 lg:block">
         <Button href="#contacto" variant="primary" size="sm">Agendar una demo</Button>
       </span>
 
@@ -118,7 +133,7 @@ import Logo from '../ui/Logo.astro';
         aria-expanded="false"
         aria-controls="menu-movil"
         aria-label="Abrir menú"
-        class="menu-icon -mr-2 grid size-11 shrink-0 place-items-center rounded-full text-text transition-colors hover:bg-surface-sunken md:hidden"
+        class="menu-icon -mr-2 grid size-11 shrink-0 place-items-center rounded-full text-text transition-colors hover:bg-surface-sunken lg:hidden"
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M3.5 7h17" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
@@ -131,7 +146,7 @@ import Logo from '../ui/Logo.astro';
     </div>
 
     {/*
-      Panel desplegable (solo móvil).
+      Panel desplegable (móvil y tablet, todo lo que quede por debajo de `lg`).
 
       Es una tarjeta de papel —borde de 2px, sombra dura— y no un overlay a
       pantalla completa: el sitio ya usa ese lenguaje en <Sticker /> y en la
@@ -160,12 +175,12 @@ import Logo from '../ui/Logo.astro';
     <div
       id="menu-movil"
       data-menu-panel
-      class="absolute inset-x-0 top-full mx-auto max-w-[78rem] px-5 md:hidden"
+      class="absolute inset-x-0 top-full mx-auto max-w-[78rem] px-5 md:px-8 lg:hidden"
     >
       <div
         class="mt-2 rounded-2xl border-2 border-text bg-surface p-3 shadow-[4px_4px_0_0_var(--text)]"
       >
-        <nav class="grid" aria-label="Principal (móvil)">
+        <nav class="grid" aria-label="Principal (menú plegado)">
           {
             NAV.map(({ label, href }) => (
               <a
@@ -320,7 +335,9 @@ import Logo from '../ui/Logo.astro';
 
     // Al ensanchar a escritorio el panel se oculta por CSS, pero el estado
     // seguiría en "abierto" y el icono en aspa al volver a estrechar.
-    window.matchMedia('(min-width: 48rem)').addEventListener('change', (e) => {
+    // 64rem = el breakpoint `lg`, donde aparece el menú de la barra. Tiene que
+    // seguir cuadrando con los `lg:` del marcado de arriba.
+    window.matchMedia('(min-width: 64rem)').addEventListener('change', (e) => {
       if (e.matches && menuOpen) setMenu(false);
     });
   }
