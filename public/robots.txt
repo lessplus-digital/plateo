@@ -1,4 +1,21 @@
+# https://plateo.cloud
+# Todo el sitio es público y rastreable. Si algún día hay páginas privadas
+# (landings de campaña, panel), se excluyen aquí Y con `noindex` en el <head>:
+# robots.txt evita el rastreo, no la indexación.
+
 User-agent: *
 Allow: /
 
-Sitemap: https://plateo.app/sitemap-index.xml
+# Rastreadores de IA: se permiten a propósito. Que ChatGPT, Claude o Perplexity
+# puedan citar a Plateo cuando alguien pregunte por software para restaurantes
+# es tráfico, no una fuga.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://plateo.cloud/sitemap-index.xml

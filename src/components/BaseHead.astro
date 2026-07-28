@@ -2,8 +2,14 @@
 /**
  * Todo el <head>: meta, canonical, Open Graph, Twitter Card y JSON-LD.
  * Es el único sitio donde se tocan tags de SEO — no los repartas por las páginas.
+ *
+ * El JSON-LD se monta como un @graph con nodos identificados por `@id` y
+ * referenciados entre sí. Es la forma que Google entiende mejor: en vez de tres
+ * bloques sueltos que hablan de cosas distintas, una sola entidad "Plateo" con
+ * su web, su producto y su página colgando de ella. Las páginas pueden añadir
+ * nodos propios (FAQPage, BreadcrumbList) por la prop `schema`.
  */
-import { SITE } from '../consts';
+import { SITE, LINKS } from '../consts';
 import '../styles/global.css';
 
 interface Props {
@@ -13,6 +19,10 @@ interface Props {
   image?: string;
   /** Excluir del índice de Google (gracias, páginas legales y landings de campaña). */
   noindex?: boolean;
+  /** Nodos JSON-LD extra de la página (FAQPage, BreadcrumbList…). */
+  schema?: Record<string, unknown>[];
+  /** Migas para el schema. `[{ name, href }]`, sin incluir la home. */
+  breadcrumb?: { name: string; href: string }[];
 }
 
 const {
@@ -20,6 +30,8 @@ const {
   description = SITE.description,
   image = SITE.ogImage,
   noindex = false,
+  schema = [],
+  breadcrumb = [],
 } = Astro.props;
 
 // Home usa el título completo; el resto lleva sufijo de marca.
@@ -27,34 +39,129 @@ const pageTitle = title ? `${title} · ${SITE.titleTemplate}` : SITE.defaultTitl
 
 const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
 const ogImage = new URL(image, Astro.site);
+const logo = new URL('/favicon.svg', Astro.site);
 
-// Datos estructurados: le dicen a Google qué es Plateo, no solo qué dice la página.
+/*
+  Sin `noindex` se le dice a Google que puede mostrar el resultado enriquecido
+  completo: miniatura grande, fragmento largo y vista previa de vídeo. Por
+  defecto Google recorta la imagen a miniatura, que en móvil es la diferencia
+  entre un resultado que se ve y uno que no.
+*/
+const robots = noindex
+  ? 'noindex, nofollow'
+  : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+
+const ORG_ID = `${SITE.url}/#organization`;
+const SITE_ID = `${SITE.url}/#website`;
+
+const migas = [{ name: 'Inicio', href: '/' }, ...breadcrumb];
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     {
       '@type': 'Organization',
-      '@id': `${SITE.url}/#organization`,
+      '@id': ORG_ID,
       name: SITE.name,
       url: SITE.url,
-      description: SITE.description,
+      description: SITE.tagline,
+      logo: {
+        '@type': 'ImageObject',
+        url: logo.href,
+        contentUrl: logo.href,
+      },
+      image: ogImage.href,
+      email: LINKS.email,
+      telephone: LINKS.whatsappE164,
+      foundingDate: SITE.founded,
+      areaServed: {
+        '@type': 'Country',
+        name: SITE.countryName,
+      },
+      // Los perfiles reales de la marca. Es como Google confirma que la
+      // organización de la web y la de las redes son la misma.
+      sameAs: [LINKS.instagram],
+      contactPoint: [
+        {
+          '@type': 'ContactPoint',
+          contactType: 'sales',
+          telephone: LINKS.whatsappE164,
+          email: LINKS.email,
+          availableLanguage: ['es'],
+          areaServed: SITE.country,
+        },
+      ],
     },
     {
       '@type': 'WebSite',
-      '@id': `${SITE.url}/#website`,
+      '@id': SITE_ID,
       url: SITE.url,
       name: SITE.name,
+      description: SITE.description,
       inLanguage: SITE.lang,
-      publisher: { '@id': `${SITE.url}/#organization` },
+      publisher: { '@id': ORG_ID },
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${canonical.href}#webpage`,
+      url: canonical.href,
+      name: pageTitle,
+      description,
+      inLanguage: SITE.lang,
+      isPartOf: { '@id': SITE_ID },
+      about: { '@id': ORG_ID },
+      primaryImageOfPage: ogImage.href,
     },
     {
       '@type': 'SoftwareApplication',
+      '@id': `${SITE.url}/#software`,
       name: SITE.name,
       applicationCategory: 'BusinessApplication',
-      operatingSystem: 'Web',
+      applicationSubCategory: 'Restaurant Management Software',
+      operatingSystem: 'Web, Android, iOS',
       description: SITE.description,
       url: SITE.url,
+      inLanguage: SITE.lang,
+      publisher: { '@id': ORG_ID },
+      /*
+        El precio en el schema es lo que permite que Google muestre la cifra
+        junto al resultado. Va sin `aggregateRating`: inventar valoraciones que
+        no existen es motivo de penalización manual, no un atajo.
+      */
+      offers: {
+        '@type': 'Offer',
+        price: '490000',
+        priceCurrency: 'COP',
+        category: 'subscription',
+        url: `${SITE.url}/#precios`,
+        availability: 'https://schema.org/InStock',
+      },
+      featureList: [
+        'Agente de IA que atiende WhatsApp',
+        'Toma de pedidos y domicilios',
+        'Reservas de mesas',
+        'Panel de pedidos en tiempo real',
+        'Ficha de clientes e historial',
+        'Estadísticas de ventas',
+        'Reseñas de clientes',
+      ],
     },
+    // Migas: en móvil Google las pinta en lugar de la URL cruda.
+    ...(migas.length > 1
+      ? [
+          {
+            '@type': 'BreadcrumbList',
+            '@id': `${canonical.href}#breadcrumb`,
+            itemListElement: migas.map((m, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              name: m.name,
+              item: new URL(m.href, SITE.url).href,
+            })),
+          },
+        ]
+      : []),
+    ...schema,
   ],
 };
 ---
@@ -66,18 +173,23 @@ const jsonLd = {
 <title>{pageTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
-{noindex && <meta name="robots" content="noindex, nofollow" />}
+<meta name="robots" content={robots} />
+<meta name="googlebot" content={robots} />
+
+{/* Señal de mercado. Marginal, pero gratis y correcta en un producto de un solo país. */}
+<meta name="geo.region" content={`${SITE.country}-ANT`} />
+<meta name="geo.placename" content={SITE.city} />
 
 <meta name="theme-color" content={SITE.themeColor} />
 {/*
   Isotipo de Plateo. El .ico (16/32/48) es el fallback de los navegadores
   viejos; los actuales prefieren el SVG, que escala a cualquier densidad.
-  Los tres salen del mismo public/favicon.svg — si cambia la marca, se
-  regeneran desde ahí.
+  Los tres salen del mismo public/favicon.svg.
 */}
 <link rel="icon" href="/favicon.ico" sizes="32x32" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
 <link rel="sitemap" href="/sitemap-index.xml" />
 
 {/* Open Graph — lo que se ve al pegar el link en WhatsApp, LinkedIn, Facebook */}
@@ -88,12 +200,15 @@ const jsonLd = {
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
+<meta property="og:image:type" content="image/jpeg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={`${SITE.name} — ${SITE.tagline}`} />
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={pageTitle} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogImage} />
+<meta name="twitter:image:alt" content={`${SITE.name} — ${SITE.tagline}`} />
 
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />

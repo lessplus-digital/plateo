@@ -9,6 +9,9 @@ interface Props {
   description?: string;
   image?: string;
   noindex?: boolean;
+  /** Nodos JSON-LD propios de la página. Ver BaseHead. */
+  schema?: Record<string, unknown>[];
+  breadcrumb?: { name: string; href: string }[];
 }
 
 const props = Astro.props;
