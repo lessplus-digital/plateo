@@ -13,11 +13,12 @@ interface Props {
   /**
    * - `arrow-curve`  flecha larga con curva, de un bloque al de al lado.
    * - `arrow-short`  flecha corta y ganchuda, para señalar algo pegado.
+   * - `arrow-flow`   flecha casi horizontal, para encadenar dos columnas.
    * - `sparkle`      tres destellos, para celebrar un dato.
    * - `squiggle`     rúbrica ondulada, como firma de sección.
    * - `corner`       esquina con radios, marca de "mira aquí".
    */
-  shape: 'arrow-curve' | 'arrow-short' | 'sparkle' | 'squiggle' | 'corner';
+  shape: 'arrow-curve' | 'arrow-short' | 'arrow-flow' | 'sparkle' | 'squiggle' | 'corner';
   tone?: 'mint' | 'violet' | 'navy' | 'current';
   /** Ancho en px. El alto sale de la proporción del dibujo. */
   width?: number;
@@ -26,6 +27,13 @@ interface Props {
   /** Espeja el dibujo en horizontal (una flecha que apunte al otro lado). */
   flip?: boolean;
   delay?: number;
+  /**
+   * OJO: no le pases utilidades de `display` (`hidden`, `flex`, `block`…).
+   * El <span> de abajo lleva `inline-block` fijo y Tailwind lo emite después,
+   * así que gana él sin importar el orden dentro del atributo. Un `hidden`
+   * aquí se ignora en silencio. Si necesitas ocultarlo por breakpoint,
+   * envuelve el <Doodle /> en un elemento que lleve esa clase.
+   */
   class?: string;
 }
 
@@ -65,6 +73,21 @@ const SHAPES = {
     stroke: ['M10,8 C14,34 30,52 60,56'],
     fill: ['M50,42 L72,58 L46,66 C53,58 54,50 50,42 Z'],
     width: '2.8',
+  },
+  /*
+    Sale y llega casi a la misma altura, con una panza en medio. Es la única
+    pensada para vivir DENTRO del hueco entre dos columnas, y de ahí salen sus
+    dos rarezas: la caja es muy apaisada, y el trazo va bastante más grueso que
+    en el resto. El grosor es proporcional a la caja, así que a los anchos que
+    caben en un gutter (~64 px) un 2.6 se renderiza a 1.4 px reales y la flecha
+    desaparece. Con 3.4 aterriza en ~1.8 px, que es lo que pesan las del Hero.
+  */
+  'arrow-flow': {
+    box: '0 0 120 34',
+    ratio: 34 / 120,
+    stroke: ['M5,13 C28,26 58,29 96,19'],
+    fill: ['M85,15 L107,17 L88,28 C91,24 89,19 85,15 Z'],
+    width: '3.4',
   },
   sparkle: {
     box: '0 0 100 100',

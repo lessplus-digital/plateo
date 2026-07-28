@@ -1,55 +1,327 @@
 ---
-import { NAV, SITE, LINKS } from '../../consts';
+import { NAV, SITE } from '../../consts';
 import Button from '../ui/Button.astro';
 import Logo from '../ui/Logo.astro';
+
+/**
+ * Cabecera fija que se recoge al hacer scroll.
+ *
+ * Arriba del todo va sin fondo, para que el hero se vea limpio al cargar. Al
+ * bajar se despega del borde superior y se convierte en una píldora blanca.
+ *
+ * La barra NO cambia de ancho. Su caja es exactamente la de `container-page`
+ * (mismo `max-width` y mismo padding) en los dos estados, así que el logo cae
+ * siempre en la misma vertical que el contenido de la página. Hubo una versión
+ * que se encogía a `max-w-5xl` al hacer scroll y el salto de 14rem se leía
+ * como si la página entera se estrechara. Lo único que cambia es la piel:
+ * radio, fondo, borde y sombra.
+ *
+ * El estado vive en un solo `data-scrolled` sobre el <header>, que además es
+ * `group`; las capas de dentro reaccionan con `group-data-[scrolled]:`. Así el
+ * JS no toca clases ni estilos — solo pone y quita atributos.
+ *
+ * Tres detalles que no son casuales:
+ *
+ * - El fondo es blanco opaco, no translúcido. Con `bg-surface/80` + blur, al
+ *   pasar sobre las secciones navy el morado se colaba por debajo y la barra
+ *   se veía sucia en vez de translúcida. Opaco también ahorra la capa de
+ *   composición del `backdrop-filter`.
+ * - El radio de la píldora es `2.25rem` y no `rounded-full`. `rounded-full`
+ *   son 9999px, y al animar de 0 a 9999 el navegador recorta a la mitad de la
+ *   altura (36px) en el primer 0.4% del recorrido: se ve un salto, no una
+ *   transición. 2.25rem son exactamente esos 36px de la barra a `h-18`, así
+ *   que la curva se interpola entera y el resultado es igual de redondo.
+ * - El borde existe siempre, transparente. Si apareciera con el scroll, la
+ *   barra crecería 2px y el contenido daría un brinco.
+ *
+ * Por debajo de `md` el menú se pliega tras un botón y las secciones pasan a
+ * una tarjeta desplegable. Ver el bloque del panel más abajo.
+ */
 ---
 
-<header
-  class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition-colors duration-300 data-[scrolled]:border-line data-[scrolled]:bg-surface/85 data-[scrolled]:backdrop-blur-xl"
-  data-header
->
-  <div class="container-page flex h-18 items-center justify-between gap-6">
-    <a
-      href="/"
-      class="shrink-0 text-navy-900 transition-opacity hover:opacity-80"
-      aria-label={`${SITE.name} — inicio`}
+<header class="group fixed inset-x-0 top-0 z-50" data-header>
+  {/*
+    Capa 1: despega la barra del borde superior al hacer scroll. Solo vertical
+    — un padding horizontal aquí volvería a estrechar la barra respecto al
+    contenido de la página, que es justo lo que no queremos.
+
+    El `pt` y el alto de la barra son de donde sale el `scroll-padding-top` de
+    `global.css`: 1rem + 4.5rem = 5.5rem. Si cambias uno, cambia el otro o las
+    anclas del menú vuelven a caer descuadradas.
+  */}
+  <div
+    class="relative transition-[padding] duration-500 ease-out-quart group-data-[scrolled]:pt-3 md:group-data-[scrolled]:pt-4"
+  >
+    {/* Capa 2: la barra. Mismo ancho siempre; lo que cambia es la piel. */}
+    <div
+      class:list={[
+        'mx-auto flex h-16 max-w-[78rem] items-center justify-between gap-4 rounded-none border border-transparent px-5 md:h-18 md:px-8',
+        'transition-[border-radius,background-color,border-color,box-shadow] duration-500 ease-out-quart',
+        'group-data-[scrolled]:rounded-[2.25rem] group-data-[scrolled]:border-line group-data-[scrolled]:bg-surface',
+        'group-data-[scrolled]:shadow-[0_10px_34px_-14px_oklch(0.262_0.098_283.8/0.35)]',
+      ]}
     >
-      <Logo variant="lockup" height={22} decorative />
-    </a>
+      <a
+        href="/"
+        class="shrink-0 text-navy-900 transition-opacity hover:opacity-80"
+        aria-label={`${SITE.name} — inicio`}
+      >
+        <Logo variant="lockup" height={22} decorative />
+      </a>
 
-    <nav class="hidden items-center gap-8 md:flex" aria-label="Principal">
-      {
-        NAV.map(({ label, href }) => (
-          <a
-            href={href}
-            class="relative text-sm text-text-muted transition-colors hover:text-text"
-          >
-            {label}
-          </a>
-        ))
-      }
-    </nav>
+      {/*
+        El padding negativo de la lista compensa el de los enlaces: cada uno
+        lleva su propia caja para que el fondo del hover sea una píldora y no
+        solo un cambio de color, pero visualmente el menú tiene que seguir
+        empezando donde empezaba.
+      */}
+      <nav class="hidden items-center md:flex lg:-mx-3" aria-label="Principal">
+        {
+          NAV.map(({ label, href }) => (
+            <a
+              href={href}
+              class="rounded-full px-3 py-2 text-sm whitespace-nowrap text-text-muted transition-colors hover:bg-surface-sunken hover:text-text"
+            >
+              {label}
+            </a>
+          ))
+        }
+      </nav>
 
-    <div class="flex items-center gap-2">
-      <Button href={LINKS.login} variant="ghost" size="sm" external class="hidden sm:inline-flex">
-        Entrar al panel
-      </Button>
-      <Button href={LINKS.whatsapp} variant="primary" size="sm" external>Ver una demo</Button>
+      {/*
+        Un solo botón. Antes había también "Entrar al panel", que competía con
+        el CTA y mandaba fuera del sitio a quien todavía no es cliente: el
+        acceso al panel vive en el footer, que es donde lo busca quien ya lo
+        tiene. Este apunta al cierre de la página, no a WhatsApp — la demo se
+        pide desde ahí, con el correo como alternativa.
+      */}
+      {/*
+        El `hidden md:block` va en el <span> y NO en la clase del <Button />:
+        su clase base lleva `inline-flex`, que gana a `hidden` por el orden en
+        que Tailwind emite las reglas. Pasándoselo al componente, el botón se
+        seguía viendo en móvil y "Agendar una demo" salía dos veces —una en la
+        barra y otra dentro del panel. Mismo caso que las flechas de Steps.
+      */}
+      <span class="hidden shrink-0 md:block">
+        <Button href="#contacto" variant="primary" size="sm">Agendar una demo</Button>
+      </span>
+
+      {/*
+        Botón del menú. 44px de lado: por debajo de eso el dedo falla, y es el
+        mínimo que piden las pautas de accesibilidad para un objetivo táctil.
+        Las tres rayas son un <svg> propio, como el resto de la iconografía —
+        el aviso de no instalar sets de iconos vale también para esto.
+      */}
+      <button
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="menu-movil"
+        aria-label="Abrir menú"
+        class="menu-icon -mr-2 grid size-11 shrink-0 place-items-center rounded-full text-text transition-colors hover:bg-surface-sunken md:hidden"
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3.5 7h17" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
+          <path d="M3.5 12h17" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+          ></path>
+          <path d="M3.5 17h17" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    {/*
+      Panel desplegable (solo móvil).
+
+      Es una tarjeta de papel —borde de 2px, sombra dura— y no un overlay a
+      pantalla completa: el sitio ya usa ese lenguaje en <Sticker /> y en la
+      tarjeta de garantía, y un panel a sangre completa lo rompería para no
+      ganar nada en cuatro enlaces.
+
+      Va `absolute`, y eso resuelve dos cosas de golpe:
+
+      1. No aporta altura al <header>. Si estuviera en el flujo, la caja del
+         header mediría siempre lo que mide el panel abierto (~290px) aunque
+         estuviera cerrado, y ese rectángulo invisible se comería los clics
+         sobre el hero.
+      2. Como el header es `fixed`, el panel no empuja nada al abrirse. Por
+         eso NO hace falta animar la altura: basta con fundido y un pequeño
+         desplazamiento, que además van por compositor y salen gratis.
+
+      Hubo una versión que animaba `grid-template-rows` de `0fr` a `1fr` —la
+      técnica habitual para llegar a una altura automática— y en Chrome se
+      quedaba clavada en 0px: con `transition: none` el panel medía sus 289px
+      y con la transición puesta no interpolaba. No merecía la pena pelearla
+      para animar algo que aquí no aporta.
+
+      Cerrado no basta con que no se vea: los enlaces seguirían siendo
+      tabulables. De eso se encarga el atributo `inert`, que pone el JS.
+    */}
+    <div
+      id="menu-movil"
+      data-menu-panel
+      class="absolute inset-x-0 top-full mx-auto max-w-[78rem] px-5 md:hidden"
+    >
+      <div
+        class="mt-2 rounded-2xl border-2 border-text bg-surface p-3 shadow-[4px_4px_0_0_var(--text)]"
+      >
+        <nav class="grid" aria-label="Principal (móvil)">
+          {
+            NAV.map(({ label, href }) => (
+              <a
+                href={href}
+                class="rounded-xl px-3 py-3 font-medium text-text transition-colors hover:bg-surface-sunken"
+              >
+                {label}
+              </a>
+            ))
+          }
+        </nav>
+
+        <div class="mt-2 border-t border-line pt-3">
+          <Button href="#contacto" variant="primary" size="md" class="w-full">Agendar una demo</Button>
+        </div>
+      </div>
     </div>
   </div>
 </header>
 
-<script>
-  // Fondo translúcido solo tras hacer scroll: el hero se ve limpio al cargar.
-  const header = document.querySelector<HTMLElement>('[data-header]');
+<style>
+  /*
+    Apertura del panel.
 
-  if (header) {
+    Va aquí y no en utilidades de Tailwind por un motivo concreto: con
+    `opacity-0` + `data-[open]:opacity-100` el panel se quedaba en opacity 0
+    aunque la regla existiera en el CSS, el atributo estuviera puesto y el
+    elemento casara con el selector (comprobado con `matches()`). Tailwind v4
+    emite sus utilidades dentro de `@layer utilities`, y una capa pierde
+    siempre frente a los estilos sin capa por mucha especificidad que tenga —
+    que es justo donde Astro pone los <style> de componente. Desde aquí gana
+    sin ambigüedad y además el estado se lee de un vistazo.
+
+    Se anima `opacity` y `translate`, las dos baratas (van por compositor). La
+    altura no se anima a propósito: el header es `fixed` y el panel `absolute`,
+    así que abrirse no empuja nada y no hay nada que interpolar.
+
+    El `prefers-reduced-motion` global de `global.css` ya recorta estas
+    duraciones a 0.01ms; no hay que repetirlo.
+  */
+  [data-menu-panel] {
+    opacity: 0;
+    translate: 0 -0.5rem;
+    pointer-events: none;
+    transition:
+      opacity 0.2s var(--ease-out-quart),
+      translate 0.2s var(--ease-out-quart);
+  }
+
+  [data-menu-panel][data-open] {
+    opacity: 1;
+    translate: 0 0;
+    pointer-events: auto;
+  }
+
+  /*
+    Las tres rayas se cruzan en X al abrir. En SVG el `transform-origin` se
+    resuelve contra el lienzo entero, no contra el trazo, así que sin
+    `transform-box: fill-box` cada raya giraría alrededor de la esquina del
+    viewBox y saldrían despedidas.
+  */
+  .menu-icon path {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      transform 0.3s var(--ease-out-quart),
+      opacity 0.2s linear;
+  }
+
+  .menu-icon[aria-expanded='true'] path:nth-child(1) {
+    transform: translateY(5px) rotate(45deg);
+  }
+
+  .menu-icon[aria-expanded='true'] path:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-icon[aria-expanded='true'] path:nth-child(3) {
+    transform: translateY(-5px) rotate(-45deg);
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const panel = document.querySelector<HTMLElement>('[data-menu-panel]');
+
+  if (header && toggle && panel) {
+    let menuOpen = false;
+
+    /*
+      Histéresis: entra en modo píldora a los 24px y no vuelve hasta los 8. Con
+      un único umbral, pararse justo encima de él hace que la barra parpadee
+      entre los dos estados con cada micro-scroll del trackpad.
+
+      Con el menú abierto se fuerza el estado recogido. Si no, el panel —que sí
+      tiene fondo y borde— quedaría colgando de una barra transparente cuando
+      se abre desde lo alto de la página.
+    */
+    let scrolled = false;
+
     const sync = () => {
-      if (window.scrollY > 24) header.setAttribute('data-scrolled', '');
-      else header.removeAttribute('data-scrolled');
+      if (menuOpen) {
+        header.setAttribute('data-scrolled', '');
+        return;
+      }
+
+      const y = window.scrollY;
+
+      if (!scrolled && y > 24) {
+        scrolled = true;
+        header.setAttribute('data-scrolled', '');
+      } else if (scrolled && y < 8) {
+        scrolled = false;
+        header.removeAttribute('data-scrolled');
+      } else if (!scrolled) {
+        header.removeAttribute('data-scrolled');
+      }
     };
 
+    const setMenu = (open: boolean) => {
+      menuOpen = open;
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+      panel.toggleAttribute('data-open', open);
+      panel.inert = !open;
+      sync();
+    };
+
+    setMenu(false);
     sync();
     window.addEventListener('scroll', sync, { passive: true });
+
+    toggle.addEventListener('click', () => setMenu(!menuOpen));
+
+    // Elegir una sección navega y cierra. Sin esto el panel tapa justo aquello
+    // a lo que se acaba de saltar.
+    panel.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) setMenu(false);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menuOpen) {
+        setMenu(false);
+        toggle.focus();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (menuOpen && !header.contains(e.target as Node)) setMenu(false);
+    });
+
+    // Al ensanchar a escritorio el panel se oculta por CSS, pero el estado
+    // seguiría en "abierto" y el icono en aspa al volver a estrechar.
+    window.matchMedia('(min-width: 48rem)').addEventListener('change', (e) => {
+      if (e.matches && menuOpen) setMenu(false);
+    });
   }
 </script>

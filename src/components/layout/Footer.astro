@@ -3,91 +3,160 @@ import { NAV, SITE, LINKS } from '../../consts';
 import Logo from '../ui/Logo.astro';
 
 const year = new Date().getFullYear();
+
+/*
+  Enlaces de texto del footer: un solo sitio donde tocar el color y el hover.
+*/
+const linkClass = 'text-sm text-text-inverse-muted transition-colors hover:text-accent';
+
+/*
+  Botón redondo de red social.
+*/
+const socialClass = [
+  'inline-grid size-10 place-items-center rounded-full border border-line-inverse',
+  'text-text-inverse-muted transition-colors hover:border-accent hover:text-accent',
+].join(' ');
 ---
 
 {/*
   Comparte el navy con el CTA que va justo encima: el final de la página es un
   solo bloque oscuro, no dos franjas pegadas. De ahí que no lleve margen
   superior y sí un filete de separación.
+
+  El reparto es una grilla y no un `flex-row`, que es lo que estaba roto: a
+  partir de 640px metía en una misma fila la columna de marca (320px fijos)
+  más las dos de enlaces con 80px de separación, y eso no cabe en 640px —
+  el contenido se salía o se aplastaba. Ahora son tres escalones:
+
+    < 640px   una columna, todo apilado
+    ≥ 640px   dos columnas; la marca ocupa el ancho completo encima
+    ≥ 1024px  las tres en fila, que es donde por fin hay sitio de verdad
 */}
 <footer class="bg-surface-inverse text-text-inverse">
   <div class="container-page">
     <div
-      class="flex flex-col gap-10 border-t border-line-inverse py-14 sm:flex-row sm:justify-between"
+      class="grid gap-10 border-t border-line-inverse py-14 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr] lg:gap-16"
     >
-      <div class="max-w-xs">
+      {/* ===== Marca y redes ===== */}
+      <div class="sm:col-span-2 lg:col-span-1">
         <Logo variant="lockup" height={24} class="text-accent" />
-        <p class="mt-4 text-sm leading-relaxed text-text-inverse-muted">
+
+        <p class="mt-4 max-w-sm text-sm leading-relaxed text-text-inverse-muted">
           {SITE.description}
         </p>
+
+        {/*
+          Los glifos van dibujados aquí y no en <Icon />: aquel es el set de
+          seis del producto, con una retícula y un grosor comunes, y un logo
+          ajeno metido dentro rompe esa familia. Tampoco se pueden dibujar "a
+          mano" como el resto — un logo de red social que no se reconoce al
+          instante no cumple su única función.
+        */}
+        <ul class="mt-7 flex items-center gap-3">
+          <li>
+            <a
+              href={LINKS.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              class={socialClass}
+              aria-label={`Instagram de ${SITE.name}`}
+            >
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect
+                  x="3"
+                  y="3"
+                  width="18"
+                  height="18"
+                  rx="5.4"
+                  stroke="currentColor"
+                  stroke-width="1.7"></rect>
+                <circle cx="12" cy="12" r="4.1" stroke="currentColor" stroke-width="1.7"></circle>
+                <circle cx="17.1" cy="6.9" r="1.25" fill="currentColor"></circle>
+              </svg>
+            </a>
+          </li>
+
+          <li>
+            <a
+              href={LINKS.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              class={socialClass}
+              aria-label={`Escribirnos por WhatsApp al ${LINKS.whatsappDisplay}`}
+            >
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M12.04 2.5a9.4 9.4 0 0 0-8 14.35L2.6 21.4l4.7-1.4a9.4 9.4 0 1 0 4.74-17.5Z"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"></path>
+                <path
+                  d="M9.1 7.9c-.15-.36-.31-.37-.46-.37h-.4c-.14 0-.37.05-.56.26-.2.21-.74.72-.74 1.76s.76 2.04.87 2.18c.1.14 1.47 2.35 3.63 3.2 1.8.71 2.16.57 2.55.53.39-.03 1.26-.51 1.44-1.01.18-.5.18-.93.12-1.02-.05-.09-.2-.14-.42-.25l-1.5-.72c-.2-.1-.35-.14-.5.1-.14.21-.56.7-.69.84-.13.14-.25.16-.46.05-.22-.1-.93-.34-1.77-1.09-.65-.58-1.09-1.3-1.22-1.51-.13-.22-.01-.34.09-.44l.33-.39c.11-.13.14-.22.22-.37.07-.14.03-.27-.02-.38L9.1 7.9Z"
+                  fill="currentColor"></path>
+              </svg>
+            </a>
+          </li>
+        </ul>
       </div>
 
-      <div class="flex gap-14 sm:gap-20">
-        <nav aria-labelledby="footer-producto">
-          <p id="footer-producto" class="text-xs tracking-[0.14em] text-navy-400 uppercase">
-            Producto
-          </p>
-          <ul class="mt-4 space-y-2.5">
-            {
-              NAV.map(({ label, href }) => (
-                <li>
-                  <a
-                    href={href}
-                    class="text-sm text-text-inverse-muted transition-colors hover:text-accent"
-                  >
-                    {label}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
+      {/* ===== Producto ===== */}
+      <nav aria-labelledby="footer-producto">
+        <p id="footer-producto" class="text-xs tracking-[0.14em] text-text-inverse-faint uppercase">
+          Producto
+        </p>
+        <ul class="mt-4 space-y-2.5">
+          {
+            NAV.map(({ label, href }) => (
+              <li>
+                <a href={href} class={linkClass}>
+                  {label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
 
-        <nav aria-labelledby="footer-contacto">
-          <p id="footer-contacto" class="text-xs tracking-[0.14em] text-navy-400 uppercase">
-            Contacto
-          </p>
-          <ul class="mt-4 space-y-2.5">
-            <li>
-              <a
-                href={LINKS.whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-sm text-text-inverse-muted transition-colors hover:text-accent"
-              >
-                WhatsApp
-              </a>
-            </li>
-            <li>
-              <a
-                href={`mailto:${LINKS.email}`}
-                class="text-sm text-text-inverse-muted transition-colors hover:text-accent"
-              >
-                {LINKS.email}
-              </a>
-            </li>
-            <li>
-              <a
-                href={LINKS.login}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-sm text-text-inverse-muted transition-colors hover:text-accent"
-              >
-                Entrar al panel
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
+      {/* ===== Contacto ===== */}
+      <nav aria-labelledby="footer-contacto">
+        <p id="footer-contacto" class="text-xs tracking-[0.14em] text-text-inverse-faint uppercase">
+          Contacto
+        </p>
+        <ul class="mt-4 space-y-2.5">
+          <li>
+            <a href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer" class={linkClass}>
+              {LINKS.whatsappDisplay}
+            </a>
+          </li>
+          <li>
+            <a href={`mailto:${LINKS.email}`} class={linkClass}>{LINKS.email}</a>
+          </li>
+          <li>
+            <a href={LINKS.instagram} target="_blank" rel="noopener noreferrer" class={linkClass}>
+              {LINKS.instagramHandle}
+            </a>
+          </li>
+          {/*
+            El acceso al panel se quitó del header —allí competía con el CTA y
+            mandaba fuera a quien todavía no es cliente— y vive solo aquí, que
+            es donde lo busca quien ya lo tiene.
+          */}
+          <li>
+            <a href={LINKS.login} target="_blank" rel="noopener noreferrer" class={linkClass}>
+              Entrar al panel
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
 
     <div
       class="flex flex-col gap-2 border-t border-line-inverse py-6 sm:flex-row sm:items-center sm:justify-between"
     >
-      <p class="text-xs text-navy-400">
+      <p class="text-xs text-text-inverse-faint">
         © {year} {SITE.name}. Hecho en Medellín.
       </p>
-      <p class="text-xs text-navy-400">Desarrollado por LESS PLUS</p>
+      <p class="text-xs text-text-inverse-faint">Desarrollado por LESS PLUS</p>
     </div>
   </div>
 </footer>

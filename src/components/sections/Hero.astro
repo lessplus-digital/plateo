@@ -100,33 +100,80 @@ const CHAT: Mensaje[] = [
         </Reveal>
 
         {/*
-          Nota al margen con su flecha. `items-end` es lo que las alinea: la
-          punta de la flecha cae abajo a la derecha del dibujo, así que con
-          `items-start` quedaba muy por debajo del texto al que señala.
+          Nota al margen con su flecha.
+
+          Va con `arrow-flow` y no con `arrow-short`, y la diferencia es la
+          posición de la punta dentro del dibujo. En `arrow-short` la punta cae
+          en la esquina INFERIOR derecha (y=83% de su caja) y apunta hacia
+          abajo: alinearla con un texto que está a su derecha y en la misma
+          línea es imposible, porque haga lo que haga el flex, la punta queda
+          por debajo del renglón. Se intentó con `items-end` y el texto seguía
+          flotando por encima.
+
+          `arrow-flow` es casi horizontal y su punta está a media altura
+          (y=17 de 34, el 50% exacto). Con `items-center` la punta cae sola
+          sobre el centro del texto, sin ajustes a ojo.
+
+          Que el texto lleve `rotate(-1.2deg)` da igual: la utilidad
+          `handwritten` gira desde `left center`, justo el punto al que apunta
+          la flecha, así que ahí el desplazamiento es cero.
+
+          Los tres números del ajuste fino están puestos A OJO, mirando la
+          página, y así deben quedarse:
+
+          - `gap-0.5` en vez de `gap-2.5`: acerca el texto 8px a la punta. El
+            hueco visual real era mayor que el gap, porque la punta del dibujo
+            está en x=107 de 120 y quedaban ~6px de caja vacía detrás.
+          - `-translate-y-[5px]` en el <p>: lo sube, sin mover la flecha ni
+            afectar al layout. Va en la propiedad `translate`, independiente
+            del `transform: rotate()` de `handwritten`, así que se componen en
+            vez de pisarse.
+          - `mt-8` en vez de `mt-5`: despega el bloque de los botones.
+
+          Aviso para quien venga a "corregir" esto con matemáticas: ya se
+          intentó. Se calculó la punta exacta proyectando (107,17) del viewBox
+          con `getScreenCTM()` y se comparó contra una estimación del centro
+          óptico del texto; salía que había que BAJARLO 9px. Se hizo y se veía
+          claramente peor. El fallo estaba en la estimación del centro óptico
+          —un factor inventado sobre el cuerpo de la fuente—, no en el ojo.
+          Para alinear un garabato con una tipografía manuscrita, mira la
+          pantalla.
         */}
-        <Reveal delay={300} class="mt-5 flex items-end gap-2 pl-1">
-          <Doodle shape="arrow-short" tone="violet" width={42} rotate={-6} delay={520} />
-          <p class="handwritten pb-0.5 text-text-muted">
+        <Reveal delay={300} class="mt-8 flex items-center gap-0.5 pl-1">
+          <Doodle shape="arrow-flow" tone="violet" width={54} rotate={-3} delay={520} />
+          <p class="handwritten -translate-y-[5px] text-text-muted">
             te contestamos con el menú de tu propio local
           </p>
         </Reveal>
 
+        {/*
+          Lo que Plateo deja atrás.
+
+          Cada entrada va tachada con <Mark variant="strike" />, que existe
+          exactamente para esto («tachado, para lo que Plateo deja atrás») y no
+          se estaba usando. Antes cada línea llevaba delante una equis de 14px:
+          tres iconos idénticos repetidos que no decían nada que el tachado no
+          diga mejor, y que además son el gesto por defecto de cualquier lista
+          de «antes / después». Quitándolos el bloque tiene MENOS elementos que
+          antes, no más.
+
+          El `whitespace-nowrap` no es cosmético: <Mark /> es `inline-block` y
+          si una entrada partiera en dos líneas el trazo tacharía el bloque
+          entero en vez de la última línea. Con el `flex-wrap` de la lista, lo
+          que se reparte en varias filas son las entradas completas.
+
+          El escalonado del `delay` hace que se tachen una detrás de otra al
+          entrar en pantalla, en vez de las tres a la vez.
+        */}
         <Reveal delay={360} class="mt-11 border-t border-line pt-6">
           <p class="text-xs tracking-[0.14em] text-text-faint uppercase">Reemplaza</p>
-          <ul class="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+          <ul class="mt-4 flex flex-wrap items-center gap-x-7 gap-y-3">
             {
-              REEMPLAZA.map((item) => (
-                <li class="flex items-center gap-2 text-sm text-text-muted">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                    <path
-                      d="M3 3l8 8M11 3l-8 8"
-                      stroke="currentColor"
-                      stroke-width="1.8"
-                      stroke-linecap="round"
-                      class="text-text-faint"
-                    />
-                  </svg>
-                  {item}
+              REEMPLAZA.map((item, i) => (
+                <li class="text-[0.95rem] whitespace-nowrap text-text-muted">
+                  <Mark variant="strike" tone="violet" delay={780 + i * 140}>
+                    {item}
+                  </Mark>
                 </li>
               ))
             }
@@ -189,7 +236,7 @@ const CHAT: Mensaje[] = [
                   PV
                 </div>
                 <div class="min-w-0 flex-1">
-                  <p class="truncate text-[0.8rem] font-medium text-text-inverse">Pizzería Vera</p>
+                  <p class="truncate text-[0.8rem] font-medium text-text-inverse">Pizzería</p>
                   <p class="text-[0.65rem] text-accent">en línea · responde al instante</p>
                 </div>
               </div>

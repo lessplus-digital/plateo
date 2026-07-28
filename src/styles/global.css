@@ -104,6 +104,9 @@
   --text-faint: var(--color-navy-500);
   --text-inverse: #fff;
   --text-inverse-muted: var(--color-navy-200);
+  /* Tercer nivel sobre oscuro (créditos, aviso legal): el equivalente de
+     --text-faint en las secciones claras. */
+  --text-inverse-faint: var(--color-navy-400);
 
   --line: var(--color-navy-100);
   --line-strong: var(--color-navy-200);
@@ -130,6 +133,7 @@
   --color-text-faint: var(--text-faint);
   --color-text-inverse: var(--text-inverse);
   --color-text-inverse-muted: var(--text-inverse-muted);
+  --color-text-inverse-faint: var(--text-inverse-faint);
 
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
@@ -202,7 +206,16 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    /* Compensa el header sticky al saltar a un #ancla */
+    /*
+      Compensa el header fijo al saltar a un #ancla. Es el ÚNICO sitio donde se
+      compensa: no pongas además `scroll-mt-*` en las secciones. Las dos cosas
+      se suman —el margen de scroll del destino y el relleno de scroll del
+      contenedor— y con 6rem en cada lado el ancla caía 192px por debajo del
+      header, que mide 88px. La sección aterrizaba muy por debajo del borde.
+
+      El valor sale de la barra en su estado recogido: 1rem de separación
+      superior + 4.5rem de alto = 5.5rem, más 0.5rem de aire.
+    */
     scroll-padding-top: 6rem;
     color-scheme: light;
     -webkit-tap-highlight-color: transparent;
@@ -334,6 +347,39 @@ html.no-js [data-draw] .draw-path {
   @media (width >= 48rem) {
     padding-inline: 2rem;
   }
+}
+
+/*
+  Corrección de aterrizaje para las secciones SIN fondo propio.
+
+  El ancla apunta al borde superior de la <section> y `scroll-padding-top` la
+  deja a 6rem del techo. En una sección con color (Features, LiveDemo, CTA)
+  eso se ve bien: el corte de color cae justo bajo la barra y se lee como el
+  principio de la sección.
+
+  En una transparente pasan dos cosas, y las dos empujan hacia arriba:
+
+  1. No hay corte que ver. Lo primero visible es el texto, y está otros 6rem
+     (8 en md) más abajo por el `py` de la sección. Con el offset del ancla
+     sumado quedan hasta 14rem de blanco sobre el primer renglón.
+  2. Si la sección de encima es oscura —el caso de #como-funciona, que va
+     detrás de LiveDemo— su color termina en el punto de llegada. La barra
+     flota: ni cubre todo el ancho ni llega al techo de la ventana, así que
+     ese resto asoma por encima y por los dos costados de la píldora. Se ve
+     como un marco oscuro roto alrededor de la barra, y es lo que de verdad
+     hace pensar que el salto se quedó corto.
+
+  El valor es -6rem, exactamente el `scroll-padding-top` de arriba: lo cancela
+  y deja el borde de la sección clavado en el techo de la ventana. Medido en
+  Chrome, es el único punto en que el color de la sección anterior desaparece
+  por completo; con -3rem todavía quedaba una franja de 48px asomando.
+
+  No lleva media query. Con el borde a 0 el aire sobre el texto lo pone el
+  propio `py` de la sección, que ya es responsive: quedan 40px bajo la barra
+  en escritorio y 20px en móvil, medidos, y los dos respiran bien.
+*/
+@utility anchor-to-content {
+  scroll-margin-top: -6rem;
 }
 
 /*

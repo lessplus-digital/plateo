@@ -21,6 +21,13 @@ interface Props {
   external?: boolean;
   /** Flecha al final que se desplaza en hover. */
   arrow?: boolean;
+  /**
+   * OJO: no le pases utilidades de `display` (`hidden`, `block`, `flex`…).
+   * BASE ya lleva `inline-flex` y Tailwind lo emite después, así que gana él
+   * sin importar el orden dentro del atributo: un `hidden md:inline-flex`
+   * aquí no oculta nada. Para ocultarlo por breakpoint, envuelve el <Button />
+   * en un elemento que lleve esa clase. Mismo aviso que en <Doodle />.
+   */
   class?: string;
 }
 
