@@ -5,14 +5,24 @@ import Doodle from '../ui/Doodle.astro';
 
 /**
  * Caso de éxito. Es el ÚNICO sitio de la web donde aparece la marca de un
- * cliente: Vera es cliente de Plateo, no es Plateo. Si algún día hay más
- * casos, este bloque se convierte en varios; la regla no cambia.
+ * cliente: un cliente de Plateo no es Plateo. Si algún día hay más casos, este
+ * bloque se convierte en varios; la regla no cambia.
  *
  * Los números van en una comanda, no en tres tarjetas de estadística: es el
- * mismo objeto del hero cerrando el círculo, y de paso evita la fila de
- * métricas gigantes que lleva toda landing.
+ * mismo objeto del hero cerrando el círculo, y de paso evita la fila de métricas
+ * gigantes que lleva toda landing.
  *
- * TODO: sustituir la cita y las cifras por las reales, con permiso del cliente.
+ * 🚨 TODO ANTES DE PUBLICAR — la cita, el nombre, el local y las tres cifras de
+ * abajo son INVENTADOS, puestos para maquetar. Publicarlos tal cual es
+ * publicidad engañosa: la SIC sanciona los testimonios y las cifras que no se
+ * pueden sustentar, y tanto Google Ads como Meta rechazan la cuenta por lo
+ * mismo. Antes de que el sitio salga a producción hay dos salidas válidas:
+ *
+ *   a) sustituirlo por un testimonio real, con permiso escrito del cliente y
+ *      cifras sacadas de su propio panel; o
+ *   b) quitar <Testimonial /> de index.astro hasta que exista ese testimonio.
+ *
+ * Lo que NO vale es dejarlo con un aviso de "ejemplo" en letra pequeña.
  */
 const CIFRAS = [
   { label: 'Pedidos al mes por WhatsApp', value: '1.240' },
@@ -39,7 +49,7 @@ const CIFRAS = [
         </Reveal>
 
         <Reveal delay={160} class="mt-8 flex items-center gap-4">
-          {/* TODO: foto real del propietario cuando la tengamos */}
+          {/* Iniciales mientras no haya foto real del propietario. */}
           <div
             class="grid size-12 shrink-0 place-items-center rounded-full bg-navy-900 font-display text-base font-semibold text-accent"
             aria-hidden="true"
@@ -63,7 +73,7 @@ const CIFRAS = [
         />
 
         <Reveal variant="tilt" delay={220} blur={12}>
-          <Ticket label="Cierre de mes" code="VERA" rotate={2}>
+          <Ticket label="Cierre de mes" code="PM-01" rotate={2}>
             <dl class="space-y-4">
               {
                 CIFRAS.map((cifra) => (

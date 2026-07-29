@@ -37,7 +37,15 @@ const {
 // Home usa el título completo; el resto lleva sufijo de marca.
 const pageTitle = title ? `${title} · ${SITE.titleTemplate}` : SITE.defaultTitle;
 
-const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
+/*
+  Canonical sin barra final, incluida la home: es la misma forma que emite el
+  sitemap y la que se comparte por ahí. Que las tres coincidan evita que Search
+  Console acabe reportando dos URL para la misma página.
+*/
+const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site).href.replace(
+  /\/$/,
+  '',
+);
 const ogImage = new URL(image, Astro.site);
 const logo = new URL('/favicon.svg', Astro.site);
 
@@ -103,8 +111,8 @@ const jsonLd = {
     },
     {
       '@type': 'WebPage',
-      '@id': `${canonical.href}#webpage`,
-      url: canonical.href,
+      '@id': `${canonical}#webpage`,
+      url: canonical,
       name: pageTitle,
       description,
       inLanguage: SITE.lang,
@@ -151,7 +159,7 @@ const jsonLd = {
       ? [
           {
             '@type': 'BreadcrumbList',
-            '@id': `${canonical.href}#breadcrumb`,
+            '@id': `${canonical}#breadcrumb`,
             itemListElement: migas.map((m, i) => ({
               '@type': 'ListItem',
               position: i + 1,

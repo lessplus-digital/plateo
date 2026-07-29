@@ -1,0 +1,165 @@
+---
+/**
+ * Páginas de apoyo (FAQ, legales). La landing sigue siendo la página del sitio;
+ * estas existen para dar a Google contenido que rastrear y para cubrir las
+ * búsquedas largas que el hero no puede responder sin dejar de ser un hero.
+ *
+ * De ahí que sean sobrias: un titular, una entradilla y texto. Nada de
+ * secciones ilustradas — el lenguaje gráfico vive en la home y aquí solo
+ * distraería de lo que la persona vino a leer.
+ */
+import Layout from './Layout.astro';
+import Reveal from '../components/ui/Reveal.astro';
+
+interface Props {
+  /** Va al <title>. Con la palabra clave delante. */
+  title: string;
+  description: string;
+  /** El <h1> visible. Puede diferir del <title>, que compite en el buscador. */
+  h1: string;
+  /** Entradilla bajo el titular. */
+  intro?: string;
+  /** Fecha de última revisión, en ISO. Solo para las legales. */
+  updated?: string;
+  schema?: Record<string, unknown>[];
+  breadcrumb?: { name: string; href: string }[];
+}
+
+const { title, description, h1, intro, updated, schema, breadcrumb } = Astro.props;
+
+const fecha = updated
+  ? new Date(`${updated}T12:00:00Z`).toLocaleDateString('es-CO', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+  : null;
+---
+
+<Layout title={title} description={description} schema={schema} breadcrumb={breadcrumb}>
+  <section class="pt-32 pb-20 md:pt-40 md:pb-28">
+    <div class="container-page">
+      <div class="mx-auto max-w-2xl">
+        {/* Migas visibles: además del schema, son un enlace real de vuelta a la home. */}
+        <Reveal variant="fade">
+          <nav aria-label="Migas de pan" class="text-sm text-text-faint">
+            <a href="/" class="underline-offset-4 hover:text-text hover:underline">Inicio</a>
+            <span aria-hidden="true" class="px-2">/</span>
+            <span class="text-text-muted">{h1}</span>
+          </nav>
+        </Reveal>
+
+        <Reveal
+          as="h1"
+          delay={70}
+          blur={12}
+          class="mt-6 text-4xl font-semibold text-balance md:text-5xl"
+        >
+          {h1}
+        </Reveal>
+
+        {
+          intro && (
+            <Reveal delay={140} class="mt-6 text-lg text-text-muted text-pretty">
+              <p>{intro}</p>
+            </Reveal>
+          )
+        }
+
+        {
+          fecha && (
+            <Reveal delay={180} class="mt-6">
+              <p class="text-sm text-text-faint">
+                Última actualización: <time datetime={updated}>{fecha}</time>
+              </p>
+            </Reveal>
+          )
+        }
+
+        <Reveal delay={200} class="prose mt-14">
+          <slot />
+        </Reveal>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style is:global>
+  /*
+    Estilos de texto largo. Se escriben a mano en vez de traer
+    @tailwindcss/typography: el plugin son ~30 KB de CSS para dar formato a tres
+    páginas, y trae su propia escala de color que habría que sobrescribir token
+    a token para que no choque con la del sitio.
+  */
+  .prose h2 {
+    margin-top: 3rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  .prose h3 {
+    margin-top: 2.25rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  .prose h2 + p,
+  .prose h3 + p {
+    margin-top: 0.75rem;
+  }
+
+  .prose p,
+  .prose ul,
+  .prose ol {
+    margin-top: 1.25rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    text-wrap: pretty;
+  }
+
+  .prose ul,
+  .prose ol {
+    padding-left: 1.25rem;
+  }
+
+  .prose ul {
+    list-style: disc;
+  }
+
+  .prose ol {
+    list-style: decimal;
+  }
+
+  .prose li {
+    margin-top: 0.5rem;
+    padding-left: 0.35rem;
+  }
+
+  .prose li::marker {
+    color: var(--accent-2);
+  }
+
+  .prose a {
+    color: var(--accent-2-ink);
+    font-weight: 500;
+    text-underline-offset: 4px;
+    text-decoration: underline;
+  }
+
+  .prose a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .prose strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* Separador entre bloques largos: un filete, no una línea gruesa. */
+  .prose hr {
+    margin-top: 3rem;
+    border-color: var(--line);
+  }
+</style>

@@ -164,12 +164,8 @@ const TOTALS = { before: '$181.000', after: '$239.000' };
               <span class="text-xs text-navy-400">WhatsApp</span>
             </div>
 
-            {/*
-              Alto fijo: la conversación crece hacia arriba y los mensajes
-              viejos se van saliendo por el borde superior, como en un chat de
-              verdad. Sin alto fijo, el bloque entero daría tumbos en cada
-              vuelta del bucle.
-            */}
+            {/* Alto fijo: la conversación crece hacia arriba y los mensajes viejos
+                salen por el borde. Sin él, el bloque da tumbos en cada vuelta. */}
             <div
               data-chat
               class="flex h-[27rem] flex-col justify-end gap-2.5 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_3rem)]"
@@ -317,17 +313,14 @@ const TOTALS = { before: '$181.000', after: '$239.000' };
 
 <style>
   /*
-    Estado de reproducción. Solo se activa cuando el script arranca: si el JS
-    no llega nunca, todo queda visible tal y como lo pintó el servidor.
+    Estado de reproducción. Solo se activa cuando el script arranca: sin JS todo
+    queda visible tal y como lo pintó el servidor.
 
-    Los mensajes pendientes van con `display: none`, no con `opacity: 0`. Con
-    opacidad seguirían ocupando su hueco, y como la conversación se alinea
-    abajo (`justify-end`) los 8 mensajes invisibles empujarían al visible
-    fuera del marco por arriba. Al ocultarlos de verdad, la conversación crece
-    desde abajo como la de un chat.
-
-    Por eso la entrada es `animation` y no `transition`: una transición no
-    dispara al pasar de `display: none` a visible; una animación sí.
+    Los mensajes pendientes van con `display: none` y no con `opacity: 0`: con
+    opacidad seguirían ocupando su hueco y, como la conversación se alinea abajo
+    (`justify-end`), empujarían al visible fuera del marco. De ahí que la entrada
+    sea `animation` y no `transition` — una transición no dispara al pasar de
+    `display: none` a visible.
   */
   [data-demo].is-playing [data-step] {
     display: none;
@@ -409,11 +402,8 @@ const TOTALS = { before: '$181.000', after: '$239.000' };
     // muestra la conversación entera y el tablero completo.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    /*
-      Se marca como "en reproducción" ya mismo, no al empezar el bucle. Si se
-      esperara al observer, la conversación entera estaría a la vista y se
-      vaciaría de golpe justo cuando el usuario llega a la sección.
-    */
+    // Se marca ya mismo, no al empezar el bucle: esperando al observer la
+    // conversación entera estaría a la vista y se vaciaría de golpe al llegar.
     root.classList.add('is-playing');
 
     const { totalBefore = '', totalAfter = '' } = root.dataset;

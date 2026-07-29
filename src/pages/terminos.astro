@@ -1,0 +1,148 @@
+---
+import Pagina from '../layouts/Pagina.astro';
+import { LINKS, PRECIOS, SITE } from '../consts';
+
+/**
+ * Términos y condiciones del servicio.
+ *
+ * Igual que la política de privacidad: existe porque Google Ads y Meta piden
+ * unos términos accesibles antes de aprobar una cuenta, y porque una web que
+ * cobra $490.000 al mes sin decir en ninguna parte qué pasa si el cliente deja
+ * de pagar es una web en la que no se confía.
+ *
+ * Las cifras salen de PRECIOS para que no se desincronicen con <Pricing />.
+ *
+ * ⚠️ Borrador de trabajo, no revisado por un abogado. Falta la razón social y
+ * el NIT en cuanto la empresa esté constituida.
+ */
+const pesos = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
+
+const ACTUALIZADO = '2026-07-28';
+---
+
+<Pagina
+  title="Términos y condiciones del servicio"
+  description="Condiciones de contratación de Plateo: qué incluye el servicio, cómo se factura, qué obligaciones tiene cada parte y cómo se cancela."
+  h1="Términos y condiciones"
+  intro="Las condiciones bajo las que prestamos el servicio. Están escritas para que se entiendan sin abogado al lado."
+  updated={ACTUALIZADO}
+  breadcrumb={[{ name: 'Términos', href: '/terminos' }]}
+>
+  <h2>1. Quiénes somos y qué aceptas</h2>
+  <p>
+    Estos términos regulan la contratación y el uso de Plateo, el servicio de agente de
+    inteligencia artificial y panel de gestión para restaurantes prestado desde {SITE.city},
+    {SITE.countryName}. Al contratar el servicio o usarlo, el restaurante acepta lo que sigue.
+  </p>
+
+  <h2>2. Qué incluye el servicio</h2>
+  <p>
+    El servicio comprende el agente que atiende el WhatsApp del restaurante y el panel donde se
+    gestionan pedidos, reservas, clientes, disponibilidad del menú, reseñas y estadísticas. No
+    hay funciones bloqueadas por plan: quien contrata recibe el producto completo, con las
+    mejoras que se vayan publicando.
+  </p>
+  <p>
+    Plateo funciona sobre servicios de terceros —la plataforma de WhatsApp, proveedores de
+    modelos de lenguaje y de infraestructura— y sus condiciones y disponibilidad quedan fuera de
+    nuestro control.
+  </p>
+
+  <h2>3. Precio y facturación</h2>
+  <ul>
+    <li>
+      Mensualidad de ${pesos.format(PRECIOS.mensual)} COP, sin IVA, o ${pesos.format(PRECIOS.anual)}
+      al mes contratando doce meses por adelantado.
+    </li>
+    <li>
+      Implementación de ${pesos.format(PRECIOS.implementacion)} COP por una sola vez, incluida en
+      el plan anual.
+    </li>
+    <li>
+      Hasta {pesos.format(PRECIOS.pedidosIncluidos)} pedidos al mes. Cada pedido por encima de ese
+      tope se factura a ${pesos.format(PRECIOS.pedidoExtra)} COP.
+    </li>
+    <li>La facturación es por mes anticipado. No se cobra comisión sobre las ventas.</li>
+  </ul>
+  <p>
+    Los precios pueden actualizarse avisando con treinta días de antelación. Si el restaurante no
+    acepta el nuevo precio, puede cancelar antes de que entre en vigor sin ninguna penalización.
+  </p>
+
+  <h2>4. Garantía del primer mes</h2>
+  <p>
+    Si durante el primer mes el servicio no le sirve al restaurante, devolvemos la mensualidad.
+    Basta con pedirlo por el mismo WhatsApp por el que se contrató, dentro de ese primer mes.
+  </p>
+
+  <h2>5. Cancelación</h2>
+  <p>
+    El plan mensual no tiene permanencia y se cancela escribiendo por WhatsApp; el servicio sigue
+    activo hasta el final del periodo ya facturado. El plan anual supone un compromiso de doce
+    meses, que es lo que financia el descuento y la implementación incluida. Al terminar la
+    relación, el restaurante puede exportar sus datos en Excel o CSV.
+  </p>
+
+  <h2>6. Obligaciones del restaurante</h2>
+  <ul>
+    <li>Entregar información veraz de su carta, precios, horarios y condiciones de servicio.</li>
+    <li>Mantener actualizada la disponibilidad de productos en el panel.</li>
+    <li>Ser titular del número de WhatsApp que se conecta y estar autorizado para usarlo.</li>
+    <li>Cumplir la normativa que le aplique en materia sanitaria, comercial y de datos personales.</li>
+    <li>Custodiar las credenciales de acceso de su equipo.</li>
+  </ul>
+
+  <h2>7. Uso aceptable</h2>
+  <p>
+    El servicio no puede usarse para enviar mensajes masivos no solicitados, para suplantar a
+    terceros, para comercializar productos cuya venta esté prohibida, ni de ninguna forma que
+    vulnere las políticas de WhatsApp. El incumplimiento puede acarrear la suspensión del número
+    por parte de la propia plataforma de WhatsApp, algo que escapa a nuestro control.
+  </p>
+
+  <h2>8. Disponibilidad y soporte</h2>
+  <p>
+    Trabajamos para que el servicio esté disponible de forma continua, pero puede haber
+    interrupciones por mantenimiento, por fallos de los proveedores de los que depende o por
+    causas de fuerza mayor. El soporte se presta por WhatsApp y correo en horario hábil, y las
+    incidencias que dejan el servicio caído se atienden con prioridad.
+  </p>
+
+  <h2>9. Datos personales</h2>
+  <p>
+    Los datos de los comensales pertenecen al restaurante, que actúa como responsable del
+    tratamiento; Plateo los procesa como encargado y siguiendo sus instrucciones. El detalle está
+    en la <a href="/privacidad">política de privacidad</a>, que forma parte de estos términos.
+  </p>
+
+  <h2>10. Propiedad intelectual</h2>
+  <p>
+    El software, la marca y los materiales de Plateo son de Plateo. El contenido que carga el
+    restaurante —su carta, sus precios, sus fotos, sus datos— sigue siendo suyo, y solo lo usamos
+    para prestarle el servicio.
+  </p>
+
+  <h2>11. Responsabilidad</h2>
+  <p>
+    El agente redacta sus respuestas con la información que el restaurante haya cargado. Plateo
+    no responde por decisiones comerciales del restaurante, por errores derivados de información
+    desactualizada en su carta, ni por lucro cesante. En cualquier caso, la responsabilidad total
+    se limita al importe facturado en los tres meses anteriores al hecho que la origine.
+  </p>
+
+  <h2>12. Ley aplicable</h2>
+  <p>
+    Estos términos se rigen por la legislación colombiana. Cualquier controversia se resolverá
+    ante los jueces competentes de {SITE.city}, sin perjuicio de intentar antes un arreglo
+    directo, que es más rápido para todos.
+  </p>
+
+  <h2>13. Contacto</h2>
+  <p>
+    Para cualquier duda sobre estos términos:
+    <a href={`mailto:${LINKS.email}`}>{LINKS.email}</a> o WhatsApp
+    <a href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer">
+      {LINKS.whatsappDisplay}
+    </a>.
+  </p>
+</Pagina>

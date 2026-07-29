@@ -6,32 +6,22 @@ import Sticker from '../ui/Sticker.astro';
 import { LINKS, PRECIOS } from '../../consts';
 
 /**
- * Precio.
+ * Precio. Va la penúltima, entre <Testimonial /> y <CTA />: se responde al final,
+ * cuando ya hay valor demostrado y alguien a quien le funcionó.
  *
- * Va la penúltima, entre <Testimonial /> y <CTA />: el precio se responde al
- * final, cuando ya hay valor demostrado y alguien a quien le funcionó.
- *
- * ── Un objeto, no una tabla ───────────────────────────────────────────────
- *
- * Hubo una versión con dos planes en columnas, franja de "varios locales",
- * fila de letra pequeña en tres columnas y tarjeta de garantía aparte. Medía
- * 3.000 px —la sección más larga de la página, para decir un número— y era
- * exactamente la forma de cualquier página de precios generada.
- *
- * Esta es la rejilla asimétrica que ya usa <Features />: el argumento a la
- * izquierda, un solo objeto a la derecha. Cabe en una pantalla.
+ * Es la rejilla asimétrica de <Features /> —argumento a la izquierda, un solo
+ * objeto a la derecha— y no una tabla de planes en columnas, que es la forma de
+ * cualquier página de precios generada y ocupaba 3.000px para decir un número.
  *
  * ── El conmutador es CSS, sin una línea de JS ─────────────────────────────
  *
- * Dos radios `sr-only` y hermanos generales (`~`) en el <style> de abajo. Los
- * dos precios están en el HTML desde el principio y el CSS esconde el que no
- * toca, así que funciona con el JS caído, no parpadea al cargar y no arrastra
- * hidratación. Es el orden que pide CLAUDE.md: CSS antes que nada.
+ * Dos radios `sr-only` y hermanos generales (`~`) en el <style> de abajo. Los dos
+ * precios están en el HTML desde el principio y el CSS esconde el que no toca:
+ * funciona con el JS caído, no parpadea al cargar y el buscador indexa ambos.
  *
- * Ojo si tocas el marcado: los `<input>` tienen que seguir siendo HERMANOS
- * ANTERIORES de `.cuerpo`. El combinador `~` no sube ni retrocede — mételos
- * dentro de un <div> "para ordenar" y el conmutador deja de funcionar sin dar
- * ningún error.
+ * ⚠️ Los `<input>` tienen que seguir siendo HERMANOS ANTERIORES de `.cuerpo`. El
+ * combinador `~` no sube ni retrocede: mételos dentro de un <div> "para ordenar"
+ * y el conmutador deja de funcionar sin dar ningún error.
  */
 
 /*
@@ -59,15 +49,9 @@ const pesos = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
           </p>
         </Reveal>
 
-        {/*
-          El <Mark /> va en las últimas palabras: el trazo se dibuja por debajo
-          de la línea base y marcando algo en mitad del titular cruza por encima
-          del renglón siguiente.
-
-          Violeta subrayado porque las otras tres marcas de la página ya están
-          cogidas —menta subrayada en el hero y en Features, violeta en círculo
-          en Steps—. Cuatro trazos idénticos se leen como un tic.
-        */}
+        {/* Violeta subrayado: las otras tres marcas de la página ya están cogidas
+            (menta en hero y Features, círculo violeta en Steps) y cuatro trazos
+            idénticos se leen como un tic. */}
         <Reveal as="h2" delay={70} class="mt-4 text-4xl font-semibold text-balance md:text-5xl">
           Un precio fijo, nunca{' '}
           <Mark variant="underline" tone="violet" delay={560}>una comisión</Mark>
@@ -81,27 +65,15 @@ const pesos = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
         </Reveal>
 
         {/*
-          Aquí hubo una flecha con nota manuscrita, «y el primer mes va con
-          garantía». Se quitó por dos motivos, y los dos valen para la próxima
-          que se proponga:
-
-          1. Repetía la pegatina de la tarjeta —«garantía del primer mes»— a
-             diez centímetros de distancia y en la misma pantalla.
-          2. Con el <Mark /> del titular y la pegatina, la nota era el tercer
-             recurso gráfico en 800 px de sección. El lenguaje de la página
-             (marcador, garabatos, pegatinas) funciona porque aparece contado;
-             amontonado deja de leerse como anotación y pasa a decoración.
-
-          Se probaron alternativas —una nota que invitara a pulsar el
-          conmutador— y ninguna sobrevive a la primera pregunta: la flecha
-          apunta desde esta columna hacia el vacío, no hacia el control, que
-          está 250 px más arriba y en la otra mitad de la rejilla.
+          No metas aquí una nota manuscrita con flecha: ya se probó y no cabe. El
+          <Mark /> del titular y la pegatina de la tarjeta son los dos recursos
+          gráficos de la sección, y un tercero deja de leerse como anotación para
+          pasar a decoración. Además la flecha apuntaría al vacío — el conmutador
+          está 250px más arriba y en la otra mitad de la rejilla.
         */}
 
-        {/*
-          Los de varios locales, en una línea. No son un plan y fingir que lo
-          son obliga a dejarles un hueco donde va la cifra.
-        */}
+        {/* Los de varios locales, en una línea. No son un plan, y fingir que lo
+            son obliga a dejarles un hueco donde va la cifra. */}
         <Reveal delay={200} class="mt-10 border-t border-line pt-6">
           <p class="text-[0.95rem] text-text-muted text-pretty">
             ¿Tienes varias sedes?{' '}
@@ -115,18 +87,31 @@ const pesos = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
             </a>{' '}
             — cada una con su número y su cocina, y un consolidado de todas.
           </p>
+
+          {/*
+            Enlace a la FAQ desde el cuerpo de la home, no solo desde el footer.
+            Un enlace dentro del contenido pesa más para Google que uno del pie, y
+            aquí es donde de verdad quedan dudas: permanencia, tope de pedidos,
+            qué pasa al cancelar.
+          */}
+          <p class="mt-4 text-[0.95rem] text-text-muted text-pretty">
+            ¿Dudas sobre permanencia, pedidos incluidos o cancelación?{' '}
+            <a
+              href="/preguntas-frecuentes"
+              class="font-medium text-accent-2-ink underline-offset-4 hover:underline"
+            >
+              Están resueltas en las preguntas frecuentes
+            </a>.
+          </p>
         </Reveal>
       </div>
 
       {/* ===== Derecha: la tarjeta ===== */}
       <Reveal variant="scale" delay={180} blur={10}>
         <div class="relative">
-          {/*
-            La única pegatina de la sección, colgada de la esquina como se pega
-            una pegatina de verdad. Sustituye a la tarjeta de papel de la
-            garantía que había antes aquí: 150 px de sección para una promesa
-            que cabe en cinco palabras y una línea de letra chica.
-          */}
+          {/* La única pegatina de la sección, colgada de la esquina como se pega
+              una de verdad. Antes esto era una tarjeta de papel de 150px de alto
+              para una promesa que cabe en cinco palabras. */}
           <Sticker tone="mint" rotate={-4} class="absolute -top-3.5 left-7 z-10 sm:left-9">
             garantía del primer mes
           </Sticker>
@@ -154,14 +139,13 @@ const pesos = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
               </div>
 
               {/*
-                `tnum`: las cifras tabulares no cambian de ancho al alternar
-                entre 490.000 y 390.000, así que el "COP / mes" de al lado no
-                da un brinco lateral cada vez que se pulsa el conmutador.
+                `tnum`: las cifras tabulares no cambian de ancho al alternar entre
+                490.000 y 390.000, así que "COP / mes" no da un brinco lateral al
+                pulsar el conmutador.
 
-                `text-5xl` hasta `sm` y no `text-6xl` a secas: medido en un
-                móvil de 390 px, la tarjeta deja 294 px por dentro y la fila a
-                60 px de cuerpo pide 324 — "COP / mes" se partía en dos
-                renglones al lado del precio. A 48 px cabe entera con holgura.
+                `text-5xl` hasta `sm` y no `text-6xl` a secas: en un móvil de
+                390px la tarjeta deja 294px por dentro y la fila a 60px de cuerpo
+                pide 324, con lo que "COP / mes" se partía en dos renglones.
               */}
               <p class="mt-7 flex items-baseline gap-1.5">
                 <span class="text-xl font-medium text-text-inverse-muted">$</span>
@@ -198,18 +182,12 @@ const pesos = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
                 <li class="flex gap-2.5">
                   <span class="select-none text-accent" aria-hidden="true">—</span>
                   {/*
-                    Aquí iba, detrás del precio, «una comisión del 25% sobre un
-                    pedido de $45.000 son $11.250». Se quitó: obliga al lector a
-                    seguir una cuenta con tres cifras nuevas —un porcentaje, un
-                    ticket de ejemplo y su resultado— justo en el renglón donde
-                    tiene que entender cuánto le van a cobrar A ÉL. El que no la
-                    sigue se queda pensando que $11.250 es algún cargo de
-                    Plateo, que es el malentendido más caro posible en una
-                    tarjeta de precio.
-
-                    La comparación no se pierde: el párrafo de la izquierda ya
-                    dice que las plataformas se llevan el 25-30% de cada pedido.
-                    Ahí es un argumento; aquí era una operación aritmética.
+                    Nada de cuentas de ejemplo en esta línea. Ya se probó con «una
+                    comisión del 25% sobre un pedido de $45.000 son $11.250»: mete
+                    tres cifras nuevas justo donde el lector intenta entender
+                    cuánto le van a cobrar A ÉL, y quien no sigue la cuenta se
+                    queda pensando que esos $11.250 son un cargo de Plateo. La
+                    comparación ya la hace el párrafo de la izquierda.
                   */}
                   <span>
                     Hasta {pesos.format(PRECIOS.pedidosIncluidos)} pedidos al mes. Por encima,
@@ -259,17 +237,11 @@ const pesos = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
 
 <style>
   /*
-    Conmutador mensual / anual, sin JS.
-
-    Los dos textos están en el HTML y el CSS esconde el que no corresponde. Eso
-    da tres cosas gratis: funciona con el JS caído, no hay parpadeo al cargar
-    (nada se pinta y se corrige después) y el buscador indexa los dos precios.
-
-    Va en un <style> de componente y no en utilidades de Tailwind porque las
-    variantes `peer-*` generan `.peer:checked ~ .destino`, y eso exige que el
-    destino sea HERMANO del input. Aquí los destinos están dentro de `.cuerpo`,
-    a varios niveles de profundidad: hace falta `~ .cuerpo <descendiente>`, que
-    Tailwind no sabe expresar.
+    Conmutador mensual / anual, sin JS. Va en CSS de componente y no en utilidades
+    de Tailwind porque las variantes `peer-*` generan `.peer:checked ~ .destino`,
+    que exige que el destino sea HERMANO del input. Aquí los destinos están
+    dentro de `.cuerpo`, a varios niveles: hace falta `~ .cuerpo <descendiente>`,
+    que Tailwind no sabe expresar.
   */
   [data-ciclo] {
     /* `inline` y no `block`: estos tramos van dentro de un párrafo. */

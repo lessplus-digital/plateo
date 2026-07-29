@@ -154,13 +154,8 @@ const FULL = await Promise.all(
               data-lightbox-w={src.width}
               data-lightbox-h={src.height}
             >
-              {/*
-                Todo el aviso de que la captura se abre es el cursor de lupa.
-                El hover solo marca el borde y levanta una sombra corta: lo
-                justo para que la tarjeta se sienta viva. Se probó con una
-                pastilla de "Ver en grande" y con un zoom del 2% en la imagen,
-                y las dos ensucian una fila de diez capturas.
-              */}
+              {/* Todo el aviso de que la captura se abre es el cursor de lupa: una
+                  pastilla de "Ver en grande" ensucia una fila de diez capturas. */}
               <div class="aspect-[2/1] overflow-hidden rounded-xl border border-line bg-surface-sunken transition duration-300 ease-out-cubic group-hover:border-line-strong group-hover:shadow-[0_6px_20px_-10px_var(--color-navy-900)] group-focus-visible:border-line-strong">
                 <Image
                   src={src}

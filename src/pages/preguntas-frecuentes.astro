@@ -1,0 +1,137 @@
+---
+import Pagina from '../layouts/Pagina.astro';
+import Button from '../components/ui/Button.astro';
+import { LINKS, PRECIOS, SITE } from '../consts';
+
+/**
+ * Preguntas frecuentes.
+ *
+ * Es la página de SEO del sitio, y por eso existe. La landing responde "por qué
+ * te importa" en frases de siete palabras; esto responde lo que la gente
+ * realmente escribe en Google —"cuánto cuesta un chatbot de WhatsApp para
+ * restaurante", "se puede usar mi mismo número"— con texto suficiente para que
+ * haya algo que indexar.
+ *
+ * El array es la ÚNICA fuente: de aquí salen el HTML y el JSON-LD de FAQPage. Si
+ * las dos versiones se escribieran por separado acabarían diciendo cosas
+ * distintas, y una FAQ marcada que no coincide con la página visible es motivo
+ * de acción manual, no un descuido menor.
+ *
+ * Reglas al añadir una pregunta:
+ *
+ * 1. Escríbela como la escribiría el dueño del restaurante en el buscador, no
+ *    como la titularía un folleto. "¿Puedo seguir usando mi número?" y no
+ *    "Portabilidad del número".
+ * 2. La respuesta se sostiene sola. Nadie llega aquí desde el principio de la
+ *    página: llega desde Google, a esta pregunta suelta.
+ * 3. Entre 40 y 90 palabras. Más corto no da nada que indexar; más largo y ya no
+ *    es una pregunta frecuente, es un artículo.
+ */
+const pesos = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
+
+interface Pregunta {
+  q: string;
+  /** Texto plano: va tal cual al JSON-LD y al HTML. Sin marcado. */
+  a: string;
+}
+
+const FAQ: Pregunta[] = [
+  {
+    q: '¿Qué es Plateo?',
+    a: `Plateo es un agente de inteligencia artificial que atiende el WhatsApp de tu restaurante y un panel donde caen los pedidos organizados. El agente conversa con tus clientes con tu carta y tus precios: toma pedidos, aparta mesas, resuelve dudas de horarios o domicilios y confirma pagos. Todo lo que cierra entra al panel en tiempo real, para que la cocina solo tenga que mirar una pantalla.`,
+  },
+  {
+    q: '¿Puedo seguir usando el mismo número de WhatsApp de mi restaurante?',
+    a: 'Sí, y es lo recomendable. Conectamos el número que tus clientes ya tienen guardado y que está impreso en tus volantes, en la fachada y en tus redes. No hay que avisar a nadie del cambio ni volver a imprimir nada, porque no hay cambio: el número sigue siendo el tuyo y lo que cambia es quién contesta del otro lado.',
+  },
+  {
+    q: '¿Cuánto cuesta el servicio?',
+    a: `Un solo plan: $${pesos.format(PRECIOS.mensual)} COP al mes, sin IVA, con el agente y el panel completos y ninguna función bloqueada. Pagando el año por adelantado quedan en $${pesos.format(PRECIOS.anual)} al mes. Incluye hasta ${pesos.format(PRECIOS.pedidosIncluidos)} pedidos mensuales y por encima de eso son $${pesos.format(PRECIOS.pedidoExtra)} por pedido. La implementación cuesta $${pesos.format(PRECIOS.implementacion)} una sola vez y va incluida si tomas el plan anual.`,
+  },
+  {
+    q: '¿Plateo cobra comisión por cada pedido?',
+    a: 'No. Se paga una mensualidad fija y nada más. Es la diferencia de fondo con las plataformas de domicilio, que se quedan entre el 25% y el 30% de cada venta: allí, cuanto mejor te va, más pagas. Aquí el mes que vendas el doble sigues pagando lo mismo, y el cliente sigue siendo tuyo, con su teléfono y su historial en tu panel.',
+  },
+  {
+    q: '¿Cuánto se demora la implementación?',
+    a: 'Una semana en total, y el trabajo pesado lo hacemos nosotros. Nos pasas la carta —una foto o el Excel que ya tengas— y la montamos con tus precios y tus adiciones en un día. Conectar tu WhatsApp toma una tarde. Que tu equipo aprenda a usar el panel, unos diez minutos: si saben usar WhatsApp, saben usar esto.',
+  },
+  {
+    q: '¿Qué necesito para usar el panel de pedidos?',
+    a: 'Cualquier dispositivo con navegador e internet. Funciona en un celular viejo, en una tablet colgada en la cocina o en el computador de la caja. No hay que instalar ningún programa ni comprar equipos nuevos, y varias personas pueden tenerlo abierto a la vez: el mesero en su teléfono y la cocina en la tablet, viendo lo mismo.',
+  },
+  {
+    q: '¿El agente puede confundirse o inventarse cosas del menú?',
+    a: 'El agente responde con tu carta cargada, no con lo que le parezca: si un producto no está en tu menú, no lo ofrece, y si lo apagaste porque se acabó, deja de venderlo en la siguiente conversación. Cuando una conversación se sale de lo que puede resolver, la pasa a una persona de tu equipo, que entra al chat desde el panel y responde.',
+  },
+  {
+    q: '¿Qué pasa si un cliente quiere hablar con una persona?',
+    a: 'Cualquiera de tu equipo puede tomar la conversación desde el panel y escribir directamente, sin salir de la pantalla ni abrir otro WhatsApp. Mientras esa persona esté atendiendo, el agente se queda callado para no pisarla, y retoma la atención solo cuando la conversación termina. El cliente nunca ve el cambio: para él es el mismo chat de siempre.',
+  },
+  {
+    q: '¿En qué idiomas atiende el agente?',
+    a: 'Contesta en más de cincuenta idiomas y cambia solo al idioma en que le escriban, sin que haya que configurar nada. En zonas turísticas es la diferencia entre atender a un extranjero y perder la venta, porque el agente entiende el mensaje en inglés, portugués o francés y responde con tu mismo menú traducido al vuelo.',
+  },
+  {
+    q: '¿Sirve si mi restaurante no hace domicilios?',
+    a: 'Sí. El agente también aparta mesas, confirma reservas, manda el recordatorio antes de la visita y responde las preguntas de siempre: horarios, ubicación, si hay parqueadero, si aceptan tarjeta o si se puede llevar mascota. Un local que solo atiende en sitio usa las reservas y las preguntas frecuentes, y deja los pedidos apagados.',
+  },
+  {
+    q: '¿Qué pasa con los datos de mis clientes?',
+    a: 'Son tuyos. Los nombres, teléfonos, direcciones e historial de pedidos viven en tu panel y los puedes exportar a Excel o CSV cuando quieras. Plateo trata esa información como encargado del tratamiento, siguiendo la Ley 1581 de 2012 de protección de datos personales de Colombia, y no la vende ni la comparte con terceros.',
+  },
+  {
+    q: '¿Hay permanencia o cláusula de salida?',
+    a: 'No hay permanencia en el plan mensual: se cobra mes a mes y cancelas por el mismo WhatsApp por el que contrataste, sin llamadas de retención ni papeleo. El primer mes va con garantía: si no te sirve, te lo devolvemos. En el plan anual el compromiso es de un año, que es justamente lo que paga el descuento.',
+  },
+  {
+    q: '¿Funciona para varias sedes?',
+    a: 'Sí. Cada sede va con su propio número de WhatsApp y su propio tablero de cocina, de modo que un pedido nunca aparece en la sede equivocada, y por encima queda un consolidado con las ventas de todas. Al ser un caso distinto al del local único, el precio se cuadra aparte: escríbenos por WhatsApp y lo miramos.',
+  },
+];
+
+const schema = [
+  {
+    '@type': 'FAQPage',
+    '@id': `${SITE.url}/preguntas-frecuentes#faq`,
+    mainEntity: FAQ.map(({ q, a }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: { '@type': 'Answer', text: a },
+    })),
+  },
+];
+---
+
+<Pagina
+  title="Preguntas frecuentes sobre el agente de IA para restaurantes"
+  description="Precios, tiempos de implementación, comisiones, datos y soporte: todo lo que preguntan los restaurantes antes de poner a Plateo a atender su WhatsApp."
+  h1="Preguntas frecuentes"
+  intro="Lo que nos preguntan los dueños de restaurante antes de contratar. Si te queda alguna por fuera, escríbenos por WhatsApp y te la respondemos nosotros."
+  schema={schema}
+  breadcrumb={[{ name: 'Preguntas frecuentes', href: '/preguntas-frecuentes' }]}
+>
+  {
+    FAQ.map(({ q, a }) => (
+      <>
+        <h2>{q}</h2>
+        <p>{a}</p>
+      </>
+    ))
+  }
+
+  <hr />
+
+  <h2>¿Te queda una pregunta por fuera?</h2>
+  <p>
+    Escríbenos y te contesta una persona, no un bot. También puedes probar el agente tú
+    mismo: te dejamos pedir en un restaurante de ejemplo desde tu propio WhatsApp.
+  </p>
+
+  <div class="mt-8 flex flex-wrap gap-3">
+    <Button href={LINKS.whatsapp} variant="primary" size="lg" external arrow>
+      Escribirnos por WhatsApp
+    </Button>
+    <Button href="/#precios" variant="secondary" size="lg">Ver precios</Button>
+  </div>
+</Pagina>

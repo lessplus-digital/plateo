@@ -1,0 +1,71 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Button from '../components/ui/Button.astro';
+import Reveal from '../components/ui/Reveal.astro';
+import Doodle from '../components/ui/Doodle.astro';
+import { PAGINAS } from '../consts';
+
+/**
+ * Página no encontrada.
+ *
+ * Va con `noindex`: un 404 indexado se lleva rastreo que debería ir a las
+ * páginas que sí importan. Lo que hace falta aquí es una salida clara, y por eso
+ * la lista de enlaces — un 404 sin salida es una visita perdida.
+ */
+---
+
+<Layout
+  title="Página no encontrada"
+  description="La página que buscas no existe o cambió de dirección."
+  noindex
+>
+  <section class="pt-32 pb-24 md:pt-44 md:pb-32">
+    <div class="container-page">
+      <div class="mx-auto max-w-xl text-center">
+        <Reveal variant="fade">
+          <Doodle shape="sparkle" tone="violet" width={40} delay={320} class="mx-auto" />
+        </Reveal>
+
+        <Reveal as="p" delay={60} class="mt-6 font-display text-6xl font-semibold text-accent-2-ink">
+          404
+        </Reveal>
+
+        <Reveal as="h1" delay={110} blur={12} class="mt-4 text-3xl font-semibold text-balance md:text-4xl">
+          Esta página se salió de la carta
+        </Reveal>
+
+        <Reveal delay={170} class="mt-5 text-lg text-text-muted text-pretty">
+          <p>
+            El enlace que seguiste no lleva a ninguna parte. Puede que la dirección haya
+            cambiado o que se colara un error al escribirla.
+          </p>
+        </Reveal>
+
+        <Reveal delay={230} class="mt-9 flex flex-wrap justify-center gap-3">
+          <Button href="/" variant="primary" size="lg" arrow>Volver al inicio</Button>
+          <Button href="/preguntas-frecuentes" variant="secondary" size="lg">
+            Preguntas frecuentes
+          </Button>
+        </Reveal>
+
+        <Reveal delay={290} class="mt-12 border-t border-line pt-6">
+          <p class="text-xs tracking-[0.14em] text-text-faint uppercase">También puedes ir a</p>
+          <ul class="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2">
+            {
+              PAGINAS.map(({ label, href }) => (
+                <li>
+                  <a
+                    href={href}
+                    class="text-sm text-text-muted underline-offset-4 hover:text-text hover:underline"
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </Reveal>
+      </div>
+    </div>
+  </section>
+</Layout>

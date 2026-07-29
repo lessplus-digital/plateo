@@ -32,8 +32,11 @@ export const SITE = {
   country: 'CO',
   countryName: 'Colombia',
   city: 'Medellín',
-  /** Año de arranque del proyecto. Para el `foundingDate` del schema. */
-  founded: '2025',
+  /**
+   * Año de arranque, para el `foundingDate` del schema. Corrígelo si la empresa
+   * se constituye con otra fecha: es un dato verificable y conviene que lo sea.
+   */
+  founded: '2026',
 } as const;
 
 export const LINKS = {

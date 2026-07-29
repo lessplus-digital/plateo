@@ -1,0 +1,133 @@
+---
+import Pagina from '../layouts/Pagina.astro';
+import { LINKS, SITE } from '../consts';
+
+/**
+ * Política de tratamiento de datos personales.
+ *
+ * No está aquí por decoración: la Ley 1581 de 2012 obliga a publicarla a quien
+ * trate datos personales en Colombia, y tanto Google Ads como Meta exigen una
+ * política accesible desde el sitio para aprobar una cuenta de anuncios.
+ *
+ * ⚠️ Es un borrador de trabajo, no un documento revisado por un abogado. Antes
+ * de pautar hay que:
+ *
+ *   1. Poner la razón social y el NIT reales en RESPONSABLE, en cuanto la
+ *      empresa esté registrada en cámara de comercio.
+ *   2. Añadir la dirección física de notificaciones que exige el artículo 13
+ *      del Decreto 1377 de 2013.
+ *   3. Pasarlo por un abogado. Los porcentajes de este archivo son plantilla;
+ *      la responsabilidad no.
+ */
+const RESPONSABLE = {
+  // TODO: razón social y NIT reales cuando la empresa esté constituida.
+  nombre: 'Plateo',
+  ciudad: `${SITE.city}, ${SITE.countryName}`,
+  email: LINKS.email,
+};
+
+const ACTUALIZADO = '2026-07-28';
+---
+
+<Pagina
+  title="Política de privacidad y tratamiento de datos"
+  description="Cómo Plateo recolecta, usa, almacena y protege los datos personales de sus clientes y de los comensales de los restaurantes, conforme a la Ley 1581 de 2012."
+  h1="Política de privacidad"
+  intro="Qué datos tratamos, para qué, durante cuánto tiempo y cómo puedes pedir que los corrijamos o los borremos."
+  updated={ACTUALIZADO}
+  breadcrumb={[{ name: 'Privacidad', href: '/privacidad' }]}
+>
+  <h2>Responsable del tratamiento</h2>
+  <p>
+    {RESPONSABLE.nombre}, con domicilio en {RESPONSABLE.ciudad}, es responsable del
+    tratamiento de los datos personales recogidos a través de este sitio y de la
+    plataforma. Para cualquier asunto relacionado con esta política puedes escribir a
+    <a href={`mailto:${RESPONSABLE.email}`}>{RESPONSABLE.email}</a> o por WhatsApp al
+    <a href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer">
+      {LINKS.whatsappDisplay}
+    </a>.
+  </p>
+
+  <h2>Qué datos recogemos</h2>
+  <p>Hay dos grupos de datos y conviene no mezclarlos, porque el papel de Plateo cambia:</p>
+  <ul>
+    <li>
+      <strong>Datos de nuestros clientes.</strong> Nombre del restaurante y de la persona de
+      contacto, teléfono, correo electrónico y datos de facturación. Los recogemos cuando nos
+      escribes para pedir una demo o cuando contratas el servicio.
+    </li>
+    <li>
+      <strong>Datos de los comensales del restaurante.</strong> Nombre, número de WhatsApp,
+      dirección de entrega, historial de pedidos y el contenido de las conversaciones con el
+      agente. Estos datos son del restaurante: Plateo actúa como encargado del tratamiento y
+      los procesa siguiendo sus instrucciones.
+    </li>
+  </ul>
+
+  <h2>Para qué los usamos</h2>
+  <ul>
+    <li>Prestar el servicio: atender conversaciones, tomar pedidos, gestionar reservas y mostrarlos en el panel.</li>
+    <li>Facturar y llevar la relación comercial y contable.</li>
+    <li>Dar soporte y avisar de cambios relevantes en el servicio.</li>
+    <li>Mejorar el producto a partir de métricas agregadas, que no permiten identificar a nadie.</li>
+  </ul>
+  <p>
+    No vendemos datos personales, no los cedemos con fines publicitarios y no los usamos para
+    entrenar modelos propios.
+  </p>
+
+  <h2>Con quién los compartimos</h2>
+  <p>
+    Solo con los proveedores de infraestructura que hacen posible el servicio, y únicamente en
+    lo necesario para prestarlo: el proveedor de la API de WhatsApp (Meta), el proveedor del
+    modelo de lenguaje que redacta las respuestas, y los servicios de base de datos y de
+    alojamiento. Todos ellos actúan como encargados y están sujetos a sus propias obligaciones
+    de confidencialidad y seguridad.
+  </p>
+
+  <h2>Cuánto tiempo los guardamos</h2>
+  <p>
+    Los datos operativos —conversaciones, pedidos, reservas— se conservan mientras el
+    restaurante tenga el servicio activo, porque son su historial de negocio. Al terminar el
+    contrato el restaurante puede exportarlos, y transcurridos noventa días los eliminamos de
+    los sistemas de producción. Los datos de facturación se guardan el tiempo que exige la
+    normativa contable y tributaria colombiana.
+  </p>
+
+  <h2>Tus derechos</h2>
+  <p>
+    Conforme a la Ley 1581 de 2012 y al Decreto 1377 de 2013, cualquier titular puede conocer,
+    actualizar y rectificar sus datos personales; solicitar prueba de la autorización otorgada;
+    ser informado sobre el uso que se les ha dado; revocar la autorización o solicitar la
+    supresión de los datos cuando no exista un deber legal o contractual de conservarlos; y
+    presentar quejas ante la Superintendencia de Industria y Comercio.
+  </p>
+  <p>
+    Para ejercerlos, escribe a
+    <a href={`mailto:${RESPONSABLE.email}`}>{RESPONSABLE.email}</a> indicando tu solicitud y un
+    dato que permita identificarte. Respondemos en un plazo máximo de quince días hábiles.
+  </p>
+
+  <h2>Seguridad</h2>
+  <p>
+    El acceso al panel está protegido con credenciales individuales por usuario, las
+    comunicaciones viajan cifradas y solo el personal que necesita hacerlo por soporte tiene
+    acceso a los datos de un cliente. Ningún sistema es infalible: si llegara a ocurrir un
+    incidente que afecte a datos personales, avisamos a los afectados y a la autoridad en los
+    plazos que marca la norma.
+  </p>
+
+  <h2>Cookies y medición</h2>
+  <p>
+    Este sitio no usa cookies de publicidad ni de seguimiento entre sitios, y no comparte tu
+    navegación con terceros con fines de perfilado. Si en el futuro añadimos una herramienta de
+    analítica, será una que mida de forma agregada y sin cookies, y se anunciará en esta misma
+    página.
+  </p>
+
+  <h2>Cambios en esta política</h2>
+  <p>
+    Si cambia algo relevante lo publicamos aquí y actualizamos la fecha del encabezado. Si el
+    cambio afecta a cómo tratamos datos que ya nos confiaste, además te avisamos por correo.
+  </p>
+</Pagina>

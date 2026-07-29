@@ -10,6 +10,7 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "og": "node scripts/generar-og.mjs",
     "astro": "astro"
   },
   "dependencies": {

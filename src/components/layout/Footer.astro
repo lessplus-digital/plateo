@@ -1,17 +1,13 @@
 ---
-import { NAV, SITE, LINKS } from '../../consts';
+import { NAV, PAGINAS, SITE, LINKS } from '../../consts';
 import Logo from '../ui/Logo.astro';
 
 const year = new Date().getFullYear();
 
-/*
-  Enlaces de texto del footer: un solo sitio donde tocar el color y el hover.
-*/
+/** Enlaces de texto: un solo sitio donde tocar el color y el hover. */
 const linkClass = 'text-sm text-text-inverse-muted transition-colors hover:text-accent';
 
-/*
-  Botón redondo de red social.
-*/
+/** Botón redondo de red social. */
 const socialClass = [
   'inline-grid size-10 place-items-center rounded-full border border-line-inverse',
   'text-text-inverse-muted transition-colors hover:border-accent hover:text-accent',
@@ -142,6 +138,14 @@ const socialClass = [
               </li>
             ))
           }
+          {/*
+            La FAQ va en esta columna y no abajo con las legales: es contenido de
+            producto, responde lo que la landing no puede, y el enlace desde aquí
+            es lo que hace que Google la rastree y le pase autoridad.
+          */}
+          <li>
+            <a href="/preguntas-frecuentes" class={linkClass}>Preguntas frecuentes</a>
+          </li>
         </ul>
       </nav>
 
@@ -166,22 +170,37 @@ const socialClass = [
           </li>
           {/*
             Aquí iba «Entrar al panel». Se quitó porque todavía no hay panel
-            publicado al que mandar a nadie: un enlace que lleva a un dominio
-            que no responde hace más daño que no tenerlo. Cuando exista, vuelve
-            a este sitio —no al header, donde competía con el CTA y mandaba
-            fuera a quien todavía no es cliente— con `LINKS.login`.
+            publicado: un enlace a un dominio que no responde hace más daño que
+            no tenerlo. Cuando exista, vuelve aquí con `LINKS.login`.
           */}
         </ul>
       </nav>
     </div>
 
     <div
-      class="flex flex-col gap-2 border-t border-line-inverse py-6 sm:flex-row sm:items-center sm:justify-between"
+      class="flex flex-col gap-4 border-t border-line-inverse py-6 sm:flex-row sm:items-center sm:justify-between"
     >
       <p class="text-xs text-text-inverse-faint">
-        © {year} {SITE.name}. Hecho en Medellín.
+        © {year} {SITE.name}. Hecho en {SITE.city}.
       </p>
-      <p class="text-xs text-text-inverse-faint">Desarrollado por LESS PLUS</p>
+
+      {/* Legales. Aquí abajo porque nadie las busca, pero tienen que existir y
+          ser accesibles: Google Ads y Meta no aprueban una cuenta sin ellas. */}
+      <ul class="flex flex-wrap items-center gap-x-5 gap-y-2">
+        {
+          PAGINAS.filter(({ href }) => href !== '/preguntas-frecuentes').map(({ label, href }) => (
+            <li>
+              <a
+                href={href}
+                class="text-xs text-text-inverse-faint transition-colors hover:text-accent"
+              >
+                {label}
+              </a>
+            </li>
+          ))
+        }
+        <li class="text-xs text-text-inverse-faint">Desarrollado por LESS PLUS</li>
+      </ul>
     </div>
   </div>
 </footer>

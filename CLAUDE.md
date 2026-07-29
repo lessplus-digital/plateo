@@ -23,6 +23,7 @@ npm run dev       # servidor de desarrollo (localhost:4321)
 npm run build     # type-check (astro check) + build de producción a dist/
 npm run preview   # sirve dist/ localmente
 npm run check     # solo type-check
+npm run og        # regenera public/og.jpg desde scripts/generar-og.mjs
 ```
 
 Para levantar el dev server desde una sesión de agente, usa modo background:
@@ -51,27 +52,38 @@ poco interactivo. Si algo llegara a necesitar estado real, se añade una isla
 ## Estructura
 
 ```
+scripts/generar-og.mjs      # dibuja public/og.jpg con sharp (viene con Astro)
 src/
-  consts.ts                 # SITE, LINKS, NAV — fuente única de copy/URLs
-  layouts/Layout.astro      # html/head/body + Header + Footer
+  consts.ts                 # SITE, LINKS, PRECIOS, NAV, PAGINAS — copy y URLs
+  layouts/
+    Layout.astro            # html/head/body + Header + Footer
+    Pagina.astro            # páginas de texto (FAQ, legales) + estilos .prose
   components/
     BaseHead.astro          # ÚNICO sitio con meta/OG/canonical/JSON-LD
     layout/                 # Header, Footer
     sections/               # bloques de página, en el orden en que van en index
     ui/                     # primitivas: Button, Logo, Mark, Doodle, Sticker,
-                            # Ticket, Reveal, Carousel, VideoLoop
+                            # Ticket, Reveal, Carousel, Lightbox, Icon
   scripts/reveal.ts         # IntersectionObserver global del scroll reveal
   styles/global.css         # tokens @theme + base + utilidades
   pages/                    # una ruta por archivo
-public/                     # se sirve tal cual: robots.txt, og.jpg, /videos, /favicon
+public/                     # tal cual: robots.txt, og.jpg, site.webmanifest, favicons
+images/                     # fuentes de marca y referencias. NO entra al build
 ```
+
+La home es la página del sitio. `/preguntas-frecuentes`, `/privacidad` y
+`/terminos` son **páginas de apoyo**: existen para dar contenido rastreable y
+cubrir requisitos de las plataformas de anuncios, no para crecer el sitio. Si
+alguien propone añadir más rutas, que justifique qué búsqueda cubre cada una.
 
 ## Reglas que importan
 
 ### Rendimiento (es el motivo de elegir Astro — no lo tires)
 
-- **Nada de GIFs.** Un GIF de 3 s pesa 5–10 MB. Usa `<VideoLoop />` con MP4 + WebM:
-  10–20× menos peso. El comando de `ffmpeg` está documentado dentro del componente.
+- **Nada de GIFs.** Un GIF de 3 s pesa 5–10 MB. Si hace falta movimiento, MP4 +
+  WebM con `<video autoplay muted loop playsinline preload="none">`: 10–20× menos
+  peso. Hubo un componente `<VideoLoop />` para esto y se quitó porque nunca se
+  llegó a usar; si vuelve a hacer falta, se reescribe en veinte líneas.
 - **Imágenes siempre por `astro:assets`** (`import { Image } from 'astro:assets'`) con
   los archivos en `src/assets/`, no en `public/`. Así hay AVIF/WebP y dimensiones
   automáticas. `public/` solo para lo que debe conservar su nombre y ruta exacta.
@@ -83,11 +95,19 @@ public/                     # se sirve tal cual: robots.txt, og.jpg, /videos, /f
 ### SEO
 
 - Los tags de `<head>` viven **solo** en `BaseHead.astro`. No los dupliques en páginas.
-- Cada página nueva pasa `title` y `description` propios al `Layout`.
+- Cada página nueva pasa `title` y `description` propios al `Layout`. El `title`
+  lleva la palabra clave delante y la marca al final; máximo ~60 caracteres.
+  La `description`, entre 150 y 160.
 - Un solo `<h1>` por página, y la jerarquía de headings sin saltos.
 - `SITE.url` en `consts.ts` y `site` en `astro.config.mjs` deben coincidir siempre —
-  de ahí salen el canonical, las OG absolutas y el sitemap.
+  de ahí salen el canonical, las OG absolutas y el sitemap. Hoy: `plateo.cloud`.
 - El sitemap se genera solo en el build (`/sitemap-index.xml`).
+- **Datos estructurados:** un solo `@graph` en `BaseHead`, con nodos enlazados por
+  `@id`. Las páginas añaden los suyos con la prop `schema`. Nunca marques algo que
+  no esté visible en la página, y **nunca inventes valoraciones** (`aggregateRating`
+  sin reseñas reales es motivo de acción manual de Google).
+- Si el texto de una FAQ y su JSON-LD pueden divergir, están mal escritos: los dos
+  salen del mismo array. Ver `pages/preguntas-frecuentes.astro`.
 
 ### Accesibilidad
 
@@ -183,12 +203,13 @@ fondo y rejillas de tarjetas con iconito.
 
 ## Pendientes conocidos
 
-- `SITE.url`, `LINKS.login`, `LINKS.whatsapp` y `LINKS.email` son **placeholders**.
-- Faltan los videos reales del producto (Showcase usa marcadores).
+- `LINKS.login` apunta a un panel que todavía no está publicado, y por eso no se
+  enlaza desde ninguna parte.
 - El testimonio de `Testimonial.astro` (cita, cifras y foto) es **provisional**:
   hay que sustituirlo por el real y con permiso del cliente.
+- `/privacidad` y `/terminos` son borradores sin revisar por un abogado, y les
+  falta la razón social y el NIT.
 - Modo oscuro: los tokens ya están listos, falta el toggle. Ver «Sistema de color».
-- Falta `public/og.jpg` (1200×630) — sin él las previews en WhatsApp salen vacías.
 - Sin analítica. Cuando toque: Plausible o Umami (~1 KB), no GA4.
 
 ## Documentación de Astro

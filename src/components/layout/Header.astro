@@ -4,65 +4,42 @@ import Button from '../ui/Button.astro';
 import Logo from '../ui/Logo.astro';
 
 /**
- * Cabecera fija que se recoge al hacer scroll.
+ * Cabecera fija que se recoge al hacer scroll: arriba del todo va sin fondo y al
+ * bajar se convierte en una píldora blanca.
  *
- * Arriba del todo va sin fondo, para que el hero se vea limpio al cargar. Al
- * bajar se despega del borde superior y se convierte en una píldora blanca.
+ * La barra NO cambia de ancho —su caja es la de `container-page` en los dos
+ * estados—, así que el logo cae siempre en la misma vertical que el contenido.
+ * Lo único que cambia es la piel: radio, fondo, borde y sombra.
  *
- * La barra NO cambia de ancho. Su caja es exactamente la de `container-page`
- * (mismo `max-width` y mismo padding) en los dos estados, así que el logo cae
- * siempre en la misma vertical que el contenido de la página. Hubo una versión
- * que se encogía a `max-w-5xl` al hacer scroll y el salto de 14rem se leía
- * como si la página entera se estrechara. Lo único que cambia es la piel:
- * radio, fondo, borde y sombra.
- *
- * El estado vive en un solo `data-scrolled` sobre el <header>, que además es
- * `group`; las capas de dentro reaccionan con `group-data-[scrolled]:`. Así el
- * JS no toca clases ni estilos — solo pone y quita atributos.
+ * El estado vive en un `data-scrolled` sobre el <header>, que además es `group`;
+ * las capas de dentro reaccionan con `group-data-[scrolled]:`. El JS solo pone y
+ * quita atributos.
  *
  * Tres detalles que no son casuales:
  *
- * - El fondo es blanco opaco, no translúcido. Con `bg-surface/80` + blur, al
- *   pasar sobre las secciones navy el morado se colaba por debajo y la barra
- *   se veía sucia en vez de translúcida. Opaco también ahorra la capa de
- *   composición del `backdrop-filter`.
- * - El radio de la píldora es `2.25rem` y no `rounded-full`. `rounded-full`
- *   son 9999px, y al animar de 0 a 9999 el navegador recorta a la mitad de la
- *   altura (36px) en el primer 0.4% del recorrido: se ve un salto, no una
- *   transición. 2.25rem son exactamente esos 36px de la barra a `h-18`, así
- *   que la curva se interpola entera y el resultado es igual de redondo.
- * - El borde existe siempre, transparente. Si apareciera con el scroll, la
- *   barra crecería 2px y el contenido daría un brinco.
+ * - Fondo blanco OPACO, no translúcido: sobre las secciones navy el morado se
+ *   colaba por debajo del blur y la barra se veía sucia.
+ * - Radio `2.25rem` y no `rounded-full`: al animar de 0 a 9999px el navegador
+ *   recorta a la mitad de la altura en el primer 0.4% del recorrido y se ve un
+ *   salto. 2.25rem son esos mismos 36px, y la curva se interpola entera.
+ * - El borde existe siempre, transparente. Si apareciera con el scroll, la barra
+ *   crecería 2px y el contenido daría un brinco.
  *
- * Por debajo de `lg` el menú se pliega tras un botón y las secciones pasan a
- * una tarjeta desplegable. Ver el bloque del panel más abajo.
- *
- * El corte está en `lg` y NO en `md`, que es donde estaba, porque en `md` no
- * cabe. Medido en el navegador: el logo pide 119 px, el botón 159, los dos
- * huecos 32 y el menú 476 con las cinco secciones — 787 px de contenido contra
- * los 704 que deja una ventana de 768 con el `px-8` de la barra. Se salía 83.
- *
- * Ya se salía antes de añadir «Precios»: con cuatro entradas eran 713 contra
- * 704, nueve píxeles que pasaban desapercibidos porque el primer enlace se
- * comía el aire del logo en vez de romper la línea.
- *
- * Acortar los rótulos habría sido el otro camino y se descartó: están elegidos
- * para nombrar las mitades del producto —ver el comentario de NAV en
- * consts.ts—, y «En vivo» o «Empezar» dejan de decir qué hay al otro lado.
- * Entre eso y que la tablet use el panel desplegable, que ya está diseñado y
- * funciona, gana el panel.
+ * El corte del menú plegado está en `lg` y no en `md` porque en `md` no cabe:
+ * logo (119px) + botón (159) + huecos (32) + menú (476) = 787px de contenido
+ * contra los 704 que deja una ventana de 768. Acortar los rótulos era la
+ * alternativa, y se descartó: nombran las mitades del producto (ver NAV).
  */
 ---
 
 <header class="group fixed inset-x-0 top-0 z-50" data-header>
   {/*
-    Capa 1: despega la barra del borde superior al hacer scroll. Solo vertical
-    — un padding horizontal aquí volvería a estrechar la barra respecto al
-    contenido de la página, que es justo lo que no queremos.
+    Capa 1: despega la barra del borde superior al hacer scroll. Solo vertical —
+    un padding horizontal estrecharía la barra respecto al contenido.
 
-    El `pt` y el alto de la barra son de donde sale el `scroll-padding-top` de
+    De este `pt` y del alto de la barra sale el `scroll-padding-top` de
     `global.css`: 1rem + 4.5rem = 5.5rem. Si cambias uno, cambia el otro o las
-    anclas del menú vuelven a caer descuadradas.
+    anclas del menú caen descuadradas.
   */}
   <div
     class="relative transition-[padding] duration-500 ease-out-quart group-data-[scrolled]:pt-3 md:group-data-[scrolled]:pt-4"
@@ -84,12 +61,8 @@ import Logo from '../ui/Logo.astro';
         <Logo variant="lockup" height={22} decorative />
       </a>
 
-      {/*
-        El padding negativo de la lista compensa el de los enlaces: cada uno
-        lleva su propia caja para que el fondo del hover sea una píldora y no
-        solo un cambio de color, pero visualmente el menú tiene que seguir
-        empezando donde empezaba.
-      */}
+      {/* El padding negativo compensa el de los enlaces: cada uno lleva su caja
+          para que el hover sea una píldora, sin que el menú se desplace. */}
       <nav class="hidden items-center lg:-mx-3 lg:flex" aria-label="Principal">
         {
           NAV.map(({ label, href }) => (
@@ -104,29 +77,20 @@ import Logo from '../ui/Logo.astro';
       </nav>
 
       {/*
-        Un solo botón. Antes había también "Entrar al panel", que competía con
-        el CTA y mandaba fuera del sitio a quien todavía no es cliente: el
-        acceso al panel vive en el footer, que es donde lo busca quien ya lo
-        tiene. Este apunta al cierre de la página, no a WhatsApp — la demo se
+        Un solo botón, y apunta al cierre de la página, no a WhatsApp: la demo se
         pide desde ahí, con el correo como alternativa.
-      */}
-      {/*
-        El `hidden lg:block` va en el <span> y NO en la clase del <Button />:
-        su clase base lleva `inline-flex`, que gana a `hidden` por el orden en
-        que Tailwind emite las reglas. Pasándoselo al componente, el botón se
-        seguía viendo en móvil y "Agendar una demo" salía dos veces —una en la
-        barra y otra dentro del panel. Mismo caso que las flechas de Steps.
+
+        El `hidden lg:block` va en el <span> y NO en la clase del <Button />: su
+        clase base lleva `inline-flex`, que gana a `hidden` por el orden en que
+        Tailwind emite las reglas. Pasándoselo al componente, el botón se seguía
+        viendo en móvil y salía dos veces. Mismo caso que las flechas de Steps.
       */}
       <span class="hidden shrink-0 lg:block">
-        <Button href="#contacto" variant="primary" size="sm">Agendar una demo</Button>
+        <Button href="/#contacto" variant="primary" size="sm">Agendar una demo</Button>
       </span>
 
-      {/*
-        Botón del menú. 44px de lado: por debajo de eso el dedo falla, y es el
-        mínimo que piden las pautas de accesibilidad para un objetivo táctil.
-        Las tres rayas son un <svg> propio, como el resto de la iconografía —
-        el aviso de no instalar sets de iconos vale también para esto.
-      */}
+      {/* 44px de lado: el mínimo que piden las pautas de accesibilidad para un
+          objetivo táctil. Las rayas son un <svg> propio, como toda la iconografía. */}
       <button
         type="button"
         data-menu-toggle
@@ -146,31 +110,17 @@ import Logo from '../ui/Logo.astro';
     </div>
 
     {/*
-      Panel desplegable (móvil y tablet, todo lo que quede por debajo de `lg`).
+      Panel desplegable (todo lo que quede por debajo de `lg`). Es una tarjeta de
+      papel —borde de 2px, sombra dura—, el mismo lenguaje de <Sticker />, y no
+      un overlay a pantalla completa.
 
-      Es una tarjeta de papel —borde de 2px, sombra dura— y no un overlay a
-      pantalla completa: el sitio ya usa ese lenguaje en <Sticker /> y en la
-      tarjeta de garantía, y un panel a sangre completa lo rompería para no
-      ganar nada en cuatro enlaces.
+      Va `absolute` por dos razones: no aporta altura al <header> (en el flujo,
+      su caja mediría siempre los ~290px del panel abierto y ese rectángulo
+      invisible se comería los clics sobre el hero) y, como el header es `fixed`,
+      abrirse no empuja nada — de ahí que no haga falta animar la altura.
 
-      Va `absolute`, y eso resuelve dos cosas de golpe:
-
-      1. No aporta altura al <header>. Si estuviera en el flujo, la caja del
-         header mediría siempre lo que mide el panel abierto (~290px) aunque
-         estuviera cerrado, y ese rectángulo invisible se comería los clics
-         sobre el hero.
-      2. Como el header es `fixed`, el panel no empuja nada al abrirse. Por
-         eso NO hace falta animar la altura: basta con fundido y un pequeño
-         desplazamiento, que además van por compositor y salen gratis.
-
-      Hubo una versión que animaba `grid-template-rows` de `0fr` a `1fr` —la
-      técnica habitual para llegar a una altura automática— y en Chrome se
-      quedaba clavada en 0px: con `transition: none` el panel medía sus 289px
-      y con la transición puesta no interpolaba. No merecía la pena pelearla
-      para animar algo que aquí no aporta.
-
-      Cerrado no basta con que no se vea: los enlaces seguirían siendo
-      tabulables. De eso se encarga el atributo `inert`, que pone el JS.
+      Cerrado no basta con que no se vea: los enlaces seguirían siendo tabulables.
+      De eso se encarga el atributo `inert`, que pone el JS.
     */}
     <div
       id="menu-movil"
@@ -194,7 +144,9 @@ import Logo from '../ui/Logo.astro';
         </nav>
 
         <div class="mt-2 border-t border-line pt-3">
-          <Button href="#contacto" variant="primary" size="md" class="w-full">Agendar una demo</Button>
+          <Button href="/#contacto" variant="primary" size="md" class="w-full">
+            Agendar una demo
+          </Button>
         </div>
       </div>
     </div>
@@ -203,23 +155,13 @@ import Logo from '../ui/Logo.astro';
 
 <style>
   /*
-    Apertura del panel.
+    Apertura del panel. Va en CSS de componente y no en utilidades de Tailwind
+    porque Tailwind v4 las emite dentro de `@layer utilities`, y una capa pierde
+    siempre frente a los estilos sin capa —que es donde Astro pone esto—: un
+    `data-[open]:opacity-100` se quedaba sin efecto aunque el selector casara.
 
-    Va aquí y no en utilidades de Tailwind por un motivo concreto: con
-    `opacity-0` + `data-[open]:opacity-100` el panel se quedaba en opacity 0
-    aunque la regla existiera en el CSS, el atributo estuviera puesto y el
-    elemento casara con el selector (comprobado con `matches()`). Tailwind v4
-    emite sus utilidades dentro de `@layer utilities`, y una capa pierde
-    siempre frente a los estilos sin capa por mucha especificidad que tenga —
-    que es justo donde Astro pone los <style> de componente. Desde aquí gana
-    sin ambigüedad y además el estado se lee de un vistazo.
-
-    Se anima `opacity` y `translate`, las dos baratas (van por compositor). La
-    altura no se anima a propósito: el header es `fixed` y el panel `absolute`,
-    así que abrirse no empuja nada y no hay nada que interpolar.
-
-    El `prefers-reduced-motion` global de `global.css` ya recorta estas
-    duraciones a 0.01ms; no hay que repetirlo.
+    Solo se animan `opacity` y `translate`, las dos por compositor. El
+    `prefers-reduced-motion` global ya recorta estas duraciones.
   */
   [data-menu-panel] {
     opacity: 0;
@@ -272,13 +214,12 @@ import Logo from '../ui/Logo.astro';
     let menuOpen = false;
 
     /*
-      Histéresis: entra en modo píldora a los 24px y no vuelve hasta los 8. Con
-      un único umbral, pararse justo encima de él hace que la barra parpadee
-      entre los dos estados con cada micro-scroll del trackpad.
+      Histéresis: entra en modo píldora a los 24px y no vuelve hasta los 8. Con un
+      único umbral, pararse encima de él hace parpadear la barra en cada
+      micro-scroll del trackpad.
 
-      Con el menú abierto se fuerza el estado recogido. Si no, el panel —que sí
-      tiene fondo y borde— quedaría colgando de una barra transparente cuando
-      se abre desde lo alto de la página.
+      Con el menú abierto se fuerza el estado recogido: si no, el panel quedaría
+      colgando de una barra transparente al abrirlo desde lo alto de la página.
     */
     let scrolled = false;
 

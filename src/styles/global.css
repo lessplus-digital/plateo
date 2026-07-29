@@ -1,22 +1,15 @@
 @import 'tailwindcss';
 
 /*
-  Fuentes self-hosted (no Google Fonts CDN: bloquea el render y es un hit de
-  privacidad/RGPD). `wght.css` trae solo el eje de peso, y el unicode-range
+  Fuentes self-hosted (nunca Google Fonts por CDN: bloquea el render y es un hit
+  de privacidad/RGPD). `wght.css` trae solo el eje de peso, y el unicode-range
   hace que el navegador descargue únicamente el subset latino.
 
-  Dos familias, dos trabajos distintos:
-  - Bricolage Grotesque -> titulares. Es una grotesca variable con eje de ancho
-    y terminaciones deliberadamente irregulares: da carácter sin ser decorativa.
-  - Inter               -> todo el cuerpo y la UI. Neutra a propósito.
-
-  Hubo una tercera, Caveat, para las notas manuscritas al margen. Se quitó: el
-  subset latino pesa 73 KB (más que Inter entera) y lo usaban tres frases. Ni
-  recortándola al alfabeto español bajaba de 60 KB, porque los glifos de una
-  cursiva llevan muchísimos puntos. El aire de anotación a mano lo ponen ahora
-  las flechas dibujadas de <Doodle /> y el peso ligero de Bricolage, que ya
-  está descargada. Si algún día se echa de menos, volver a añadirla es un
-  import y cambiar la utilidad `handwritten`.
+  Dos familias y ninguna más: Bricolage Grotesque para titulares e Inter para el
+  cuerpo. Hubo una tercera, Caveat, para las notas manuscritas: 73 KB para tres
+  frases —más que Inter entera— y ni recortada al alfabeto español bajaba de 60.
+  Ese aire lo ponen ahora las flechas de <Doodle /> y el peso ligero de
+  Bricolage, que ya está descargada.
 */
 @import '@fontsource-variable/bricolage-grotesque/opsz.css';
 @import '@fontsource-variable/inter/wght.css';
@@ -95,7 +88,6 @@
 :root {
   --surface: #fff;
   --surface-sunken: var(--color-navy-25);
-  --surface-raised: #fff;
   /* Bloques oscuros de contraste (el CTA, el footer, el demo en vivo) */
   --surface-inverse: var(--color-navy-900);
 
@@ -118,14 +110,12 @@
   --accent-soft: var(--color-mint-100);
   --accent-ink: var(--color-mint-800);
   --accent-2: var(--color-violet-500);
-  --accent-2-soft: var(--color-violet-100);
   --accent-2-ink: var(--color-violet-700);
 }
 
 @theme inline {
   --color-surface: var(--surface);
   --color-surface-sunken: var(--surface-sunken);
-  --color-surface-raised: var(--surface-raised);
   --color-surface-inverse: var(--surface-inverse);
 
   --color-text: var(--text);
@@ -143,7 +133,6 @@
   --color-accent-soft: var(--accent-soft);
   --color-accent-ink: var(--accent-ink);
   --color-accent-2: var(--accent-2);
-  --color-accent-2-soft: var(--accent-2-soft);
   --color-accent-2-ink: var(--accent-2-ink);
 }
 
@@ -158,32 +147,12 @@
      impresora térmica lo pone la propia monoespaciada del equipo. */
   --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, monospace;
 
-  /* Equivalentes CSS de las curvas de GSAP que usa la referencia:
-     power2.out = easeOutCubic · power3.out = easeOutQuart */
+  /* Dos curvas, y solo dos: `cubic` para lo pequeño (hovers, botones) y `quart`
+     para lo que recorre distancia (la barra al recogerse, el panel del menú). */
   --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
   --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  /* Rebote corto para stickers y estados activos */
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  --animate-marquee: marquee 42s linear infinite;
-  --animate-blink: blink 1.1s steps(2, start) infinite;
   --animate-typing: typing 1.4s ease-in-out infinite;
-
-  @keyframes marquee {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
-  }
-
-  @keyframes blink {
-    50% {
-      opacity: 0;
-    }
-  }
 
   /* Los tres puntos de "escribiendo…" del chat */
   @keyframes typing {
@@ -350,39 +319,6 @@ html.no-js [data-draw] .draw-path {
 }
 
 /*
-  Corrección de aterrizaje para las secciones SIN fondo propio.
-
-  El ancla apunta al borde superior de la <section> y `scroll-padding-top` la
-  deja a 6rem del techo. En una sección con color (Features, LiveDemo, CTA)
-  eso se ve bien: el corte de color cae justo bajo la barra y se lee como el
-  principio de la sección.
-
-  En una transparente pasan dos cosas, y las dos empujan hacia arriba:
-
-  1. No hay corte que ver. Lo primero visible es el texto, y está otros 6rem
-     (8 en md) más abajo por el `py` de la sección. Con el offset del ancla
-     sumado quedan hasta 14rem de blanco sobre el primer renglón.
-  2. Si la sección de encima es oscura —el caso de #como-funciona, que va
-     detrás de LiveDemo— su color termina en el punto de llegada. La barra
-     flota: ni cubre todo el ancho ni llega al techo de la ventana, así que
-     ese resto asoma por encima y por los dos costados de la píldora. Se ve
-     como un marco oscuro roto alrededor de la barra, y es lo que de verdad
-     hace pensar que el salto se quedó corto.
-
-  El valor es -6rem, exactamente el `scroll-padding-top` de arriba: lo cancela
-  y deja el borde de la sección clavado en el techo de la ventana. Medido en
-  Chrome, es el único punto en que el color de la sección anterior desaparece
-  por completo; con -3rem todavía quedaba una franja de 48px asomando.
-
-  No lleva media query. Con el borde a 0 el aire sobre el texto lo pone el
-  propio `py` de la sección, que ya es responsive: quedan 40px bajo la barra
-  en escritorio y 20px en móvil, medidos, y los dos respiran bien.
-*/
-@utility anchor-to-content {
-  scroll-margin-top: -6rem;
-}
-
-/*
   Nota al margen. Solo para frases muy cortas, y casi siempre junto a una
   flecha de <Doodle />: es la flecha la que dice "esto va aparte", no la
   tipografía. Peso ligero y un grado de inclinación para separarla del texto
@@ -456,10 +392,21 @@ html.no-js [data-draw] .draw-path {
   padding-bottom: var(--ticket-tooth);
 }
 
-/* Retícula de fondo tenue, para las secciones oscuras */
-@utility grid-bg {
-  background-image:
-    linear-gradient(to right, var(--line-inverse) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--line-inverse) 1px, transparent 1px);
-  background-size: 3.5rem 3.5rem;
+/*
+  Corrección de aterrizaje para las secciones SIN fondo propio.
+
+  El ancla apunta al borde superior de la <section> y `scroll-padding-top` la
+  deja a 6rem del techo. En una sección con color eso se ve bien: el corte de
+  color cae bajo la barra y se lee como el principio de la sección. En una
+  transparente no hay corte que ver, y si además la sección de encima es oscura
+  su color asoma por encima y por los costados de la píldora del header, que se
+  ve como un marco roto.
+
+  El valor es -6rem, exactamente el `scroll-padding-top`: lo cancela y deja el
+  borde clavado en el techo de la ventana. Medido en Chrome, con -3rem todavía
+  asomaba una franja de 48px. No lleva media query: el aire sobre el texto lo
+  pone el `py` de la sección, que ya es responsive.
+*/
+@utility anchor-to-content {
+  scroll-margin-top: -6rem;
 }

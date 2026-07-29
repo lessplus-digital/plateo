@@ -43,16 +43,17 @@ export default defineConfig({
       serialize(item) {
         const path = new URL(item.url).pathname.replace(/\/$/, '');
 
-        if (path === '') {
-          return { ...item, priority: 1.0, changefreq: 'weekly' };
-        }
+        // Solo se toca la prioridad: `changefreq` lo ignora Google desde hace
+        // años, y variarlo por página obligaría a importar el enum del paquete
+        // `sitemap` para que el type-check lo acepte.
+        if (path === '') return { ...item, priority: 1.0 };
 
-        // Las legales cambian una vez al año y no compiten por nada.
+        // Las legales no compiten por nada; existen por obligación.
         if (path === '/privacidad' || path === '/terminos') {
-          return { ...item, priority: 0.3, changefreq: 'yearly' };
+          return { ...item, priority: 0.3 };
         }
 
-        return { ...item, priority: 0.7, changefreq: 'monthly' };
+        return { ...item, priority: 0.7 };
       },
     }),
   ],

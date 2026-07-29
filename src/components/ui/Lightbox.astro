@@ -76,11 +76,9 @@ const CHROME =
       </header>
 
       {/*
-        Alto FIJO, no ajustado a la imagen. Las capturas no comparten relación
-        de aspecto, así que con un marco elástico el panel crecía y encogía al
-        pasar de lámina y las flechas del pie se movían bajo el cursor: había
-        que volver a buscarlas en cada paso. Ahora la que se ajusta al marco es
-        la imagen, y lo que sobra queda como aire a los lados.
+        Alto FIJO, no ajustado a la imagen: las capturas no comparten relación de
+        aspecto y con un marco elástico las flechas del pie se movían bajo el
+        cursor en cada lámina. Aquí la que se ajusta es la imagen.
 
         El marco hace además de ventana: en zoom la captura se sale y se navega
         desplazándola, que es la única forma de leer una tabla en un móvil.
@@ -151,19 +149,14 @@ const CHROME =
   /*
     Dos estados de la imagen dentro de un marco que nunca cambia de tamaño:
 
-    - ajustada  -> cabe entera, centrada, y el resto del marco queda vacío.
-                   El límite es el 100% del marco, no una fracción del alto de
-                   la ventana: así el panel mide lo mismo en todas las láminas.
-    - a tamaño  -> ancho fijo de 1600px. El marco se desborda y se desplaza.
-                   Es lo que hace legible una tabla del panel en un teléfono.
+    - ajustada  -> cabe entera y centrada; el resto del marco queda vacío.
+    - a tamaño  -> ancho fijo de 1600px, el marco se desborda y se desplaza. Es
+                   lo que hace legible una tabla del panel en un teléfono.
 
     El centrado se apaga en zoom: en un contenedor con scroll, un hijo centrado
-    que se desborda deja inalcanzable su esquina superior izquierda.
-  */
-  /*
-    Ajustada no hay nada que desplazar, y `auto` sacaba igualmente una barra:
-    la imagen encaja por el ancho y su alto redondeado se pasa del marco por
-    una fracción de píxel. El scroll se enciende solo con el zoom.
+    que se desborda deja inalcanzable su esquina superior izquierda. Y el
+    `overflow` arranca en `hidden` porque con `auto` salía una barra aun ajustada
+    —el alto redondeado se pasa del marco por una fracción de píxel—.
   */
   [data-lightbox-frame] {
     display: grid;

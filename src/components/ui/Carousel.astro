@@ -8,11 +8,9 @@
  *
  * Cada hijo del slot debe llevar `class="snap-start shrink-0"` y su propio ancho.
  *
- * El fundido de los bordes lo pone el propio componente sobre la pista, y se
- * apaga en el lado donde ya no queda contenido. Antes se pasaba desde fuera
- * como `class="mask-edges"`, que aterrizaba en la raíz: el degradado incluía
- * los botones —que van alineados a la derecha, justo dentro de la zona que se
- * desvanece— y se los comía a medias.
+ * El fundido de los bordes lo pone el componente sobre la PISTA, y se apaga en el
+ * lado donde ya no queda contenido. No lo pases desde fuera con `mask-edges`:
+ * aterriza en la raíz y el degradado se come los botones a medias.
  */
 interface Props {
   /** Texto para lectores de pantalla que describe el conjunto. */

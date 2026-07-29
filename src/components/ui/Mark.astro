@@ -17,25 +17,17 @@
  *     Tu equipo atiende{' '}
  *     <Mark>el local</Mark>.
  *
- * Si se deja el espacio suelto al final de la línea anterior, el compilador de
- * Astro lo recorta al saltar de línea y sale «atiendeel local». Poner el texto
- * y la etiqueta en la misma línea también funciona, pero es frágil: en cuanto
- * el formateador parta la línea por longitud, el fallo vuelve sin que nadie
- * toque el contenido. `{' '}` es una expresión y nunca se recorta.
- *
- * Y no lo arregles metiendo el espacio DENTRO del slot (`<Mark> el local`): el
- * envoltorio es `inline-block` y el CSS descarta el blanco al principio de la
- * caja, así que ahí tampoco se ve.
+ * Un espacio suelto al final de la línea anterior lo recorta el compilador de
+ * Astro al saltar de línea y sale «atiendeel local». Meterlo DENTRO del slot
+ * tampoco vale: el envoltorio es `inline-block` y el CSS descarta el blanco
+ * inicial de la caja.
  *
  * Dos reglas de uso:
  *
- * 1. Como mucho UNA marca por titular. Dos compiten entre ellas y el énfasis
- *    se pierde.
- * 2. Marca frases CORTAS, de una o dos palabras. El envoltorio es
- *    `inline-block`, así que si la frase no cabe en el ancho disponible parte
- *    por dentro y el trazo acaba subrayando el bloque entero en vez de la
- *    última línea. En un h1 a tamaño móvil eso pasa a partir de unos 12
- *    caracteres.
+ * 1. Como mucho UNA marca por titular. Dos compiten y el énfasis se pierde.
+ * 2. Marca frases CORTAS, de una o dos palabras. Al ser `inline-block`, una
+ *    frase que no quepa parte por dentro y el trazo subraya el bloque entero en
+ *    vez de la última línea. En un h1 en móvil eso pasa hacia los 12 caracteres.
  */
 interface Props {
   /**

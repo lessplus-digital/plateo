@@ -1,0 +1,24 @@
+{
+  "name": "Plateo — Agente de IA para restaurantes",
+  "short_name": "Plateo",
+  "description": "Agente de IA que atiende el WhatsApp de tu restaurante y un panel que organiza los pedidos en tiempo real.",
+  "lang": "es-CO",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#211951",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

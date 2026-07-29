@@ -83,21 +83,15 @@ const PASOS = [
             </p>
 
             {/*
-              Flecha hacia el paso siguiente. La última no lleva.
+              Flecha hacia el paso siguiente; la última no lleva. `left-full` la
+              clava en el gutter y `top-2` la centra con el círculo del número:
+              la flecha va de número a número. Violeta como todas las del sitio —
+              la menta sobre blanco da 1.5:1 y el trazo se ve lavado.
 
-              `left-full` + ancho 64 la deja clavada en el gutter, y `top-2`
-              la centra con el círculo del número (36 px de alto): la flecha
-              va de número a número, que es lo único a lo que tiene sentido
-              que apunte. Violeta como todas las flechas del sitio — la menta
-              sobre blanco da 1.5:1 y el trazo se veía lavado.
-
-              El `hidden md:block` va en un <span> envolvente y NO en la clase
-              del <Doodle />. Pasándoselo al componente no hacía nada: su span
-              lleva `inline-block` fijo, y esa utilidad le gana a `hidden` por
-              el orden en que Tailwind emite las reglas (el orden dentro del
-              atributo class no decide). El elemento acababa con display block
-              —`absolute` blockifica— y las flechas se pintaban en móvil fuera
-              del contenedor, con 29px de scroll horizontal de regalo.
+              El `hidden md:block` va en el <span> envolvente y NO en la clase del
+              <Doodle />: su span lleva `inline-block` fijo, que gana a `hidden`
+              por el orden en que Tailwind emite las reglas. Pasándoselo al
+              componente, las flechas se pintaban en móvil fuera del contenedor.
             */}
             {i < PASOS.length - 1 && (
               <span class="absolute top-2 left-full hidden md:block">
@@ -114,13 +108,5 @@ const PASOS = [
         ))
       }
     </ol>
-
-    {/*
-      Aquí vivía la tarjeta de «garantía del primer mes». Se movió a
-      <Pricing />: «si no te sirve, te devolvemos el mes» es un manejo de
-      objeción de PRECIO, y llevaba tres secciones de distancia con el sitio
-      donde se dice el precio. La sección cierra en el paso 3, que es donde
-      termina lo que cuenta.
-    */}
   </div>
 </section>

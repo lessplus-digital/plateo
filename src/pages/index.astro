@@ -10,7 +10,8 @@ import Pricing from '../components/sections/Pricing.astro';
 import CTA from '../components/sections/CTA.astro';
 ---
 
-{/* Sin `title`: la home usa SITE.defaultTitle completo. */}
+{/* Sin `title`: la home usa SITE.defaultTitle completo, que es el que lleva la
+    palabra clave. El resto de páginas pasa el suyo. */}
 <Layout>
   {/*
     Cada sección responde una pregunta distinta, y ese es el orden:
@@ -23,16 +24,12 @@ import CTA from '../components/sections/CTA.astro';
       Pricing     cuánto cuesta
       CTA         qué hago ahora
 
-    Features no lleva pantallazos a propósito: le robarían el golpe a LiveDemo
-    y al Showcase, que es donde de verdad se ven las pantallas.
+    Features no lleva pantallazos a propósito: le robarían el golpe a LiveDemo y
+    al Showcase. Y Pricing va DESPUÉS de Testimonial: puesto antes, el visitante
+    ve la cifra sin nada que la sostenga todavía.
 
-    Pricing va DESPUÉS de Testimonial y no antes: el precio es lo último que se
-    responde, cuando ya hay valor demostrado y alguien a quien le funcionó que
-    lo justifique. Puesto entre Showcase y Testimonial, el visitante ve la cifra
-    sin nada que la sostenga todavía.
-
-    El color alterna claro / oscuro para que el scroll tenga ritmo. Si añades
-    una sección, mira que no queden dos oscuras seguidas. Hoy va:
+    El color alterna claro / oscuro para que el scroll tenga ritmo. Si añades una
+    sección, mira que no queden dos oscuras seguidas. Hoy va:
     claro · sunken · OSCURA · claro · claro · sunken · claro · OSCURA.
   */}
   <Hero />
